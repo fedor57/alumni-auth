@@ -9,9 +9,17 @@
 
 <p>Your code is {{ code }}</p>
 
+<input type="hidden" value="{{ code }}" class="code" />
+
 <div class="ui-widget">
   <label for="alumni-name">Alumni: </label>
   <input id="alumni-name" class="alumni-select">
+</div>
+
+<div class="hidden invite">
+    Сообщение для <span class="invitee"></span>:<br/>
+    <textarea style="width:600px; height:300px;" class="invite-text">
+    </textarea>
 </div>
 
 {% endblock %}
