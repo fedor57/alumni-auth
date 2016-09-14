@@ -1,0 +1,17 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}.</h2>
+<h3>{{ message }}</h3>
+
+<h3>Let's invite!</h3>
+
+<p>Your code is {{ code }}</p>
+
+<div class="ui-widget">
+  <label for="alumni-name">Alumni: </label>
+  <input id="alumni-name" class="alumni-select">
+</div>
+
+{% endblock %}
