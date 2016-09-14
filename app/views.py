@@ -78,17 +78,34 @@ def askcode(request):
 
 import json
 from django.http import HttpResponse
-from app.models import alumni
+from app.models import alumni as Alumnus
+from app.models import invites as Invite
+
+def generate_code(request):
+    code = request.GET['code']
+    alumnus_id = request.GET['id']
+    inviter = Invite.objects.get(code=code).alumni
+    invitee = Alumnus.objects.get(alumnus_id = alumnus_id)
+    inv = Invite(alumni_id = alumnus_id)
+    inv.save()
+    data = {
+        'code': inv.code,
+        'invitee': unicode(invitee),
+        'invitee_name': invitee.full_name,
+        'inviter': unicode(inviter),
+    }
+    return HttpResponse(json.dumps(data), 'application/json')
+
 
 def get_alumni(request):
     #if request.is_ajax():
     q = request.GET.get('term', '')
-    als = alumni.objects.filter(full_name__icontains = q )[:20]
+    als = Alumnus.objects.filter(full_name__icontains = q )[:20]
     results = []
     for al in als:
         al_json = {}
         al_json['id'] = al.alumnus_id
-        al_json['label'] = str(al)
+        al_json['label'] = unicode(al)
         al_json['value'] = al.full_name
         results.append(al_json)
     data = json.dumps(results)

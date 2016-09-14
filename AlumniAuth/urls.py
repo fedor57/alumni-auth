@@ -22,8 +22,9 @@ urlpatterns = [
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),
     url(r'^invite$', app.views.askcode),
-    url(r'^invite/(?P<code>\d+)$', app.views.invite),
+    url(r'^invite/(?P<code>[\w\-]+)$', app.views.invite),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
+    url(r'^api/generate_code/', app.views.generate_code),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {
