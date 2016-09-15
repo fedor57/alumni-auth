@@ -80,14 +80,19 @@ import json
 from django.http import HttpResponse
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
+from app.models import invite_links as InviteLink
 
 def generate_code(request):
     code = request.GET['code']
     alumnus_id = request.GET['id']
-    inviter = Invite.objects.get(code=code).alumni
+    source_code = Invite.objects.get(code=code)
+    inviter = source_code.alumni
     invitee = Alumnus.objects.get(alumnus_id = alumnus_id)
     inv = Invite(alumni_id = alumnus_id)
     inv.save()
+    link = InviteLink(code_from=source_code, code_to=inv)
+    link.save()
+
     data = {
         'code': inv.code,
         'invitee': unicode(invitee),

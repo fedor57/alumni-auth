@@ -5,7 +5,7 @@ Definition of models.
 # Create your models here.
 from django.db import models
 from translit import translit
-import uuid
+from random import randint
 
 
 # Each model extends models.Model
@@ -38,11 +38,9 @@ class invites(models.Model):
         super(invites, self).__init__(*args, **kwargs)
         if not self.code and self.alumni_id:
             code = [self.PREFIX, str(self.alumni.year) + translit(self.alumni.letter).lower()]
-            name, surname = self.alumni.full_name.split(' ')
+            surname, name = self.alumni.full_name.split(' ')
             code.append(translit(surname[:3]).lower() + translit(name[0]).lower())
-            code.append(str(uuid.uuid4()))
-            code.append(str(uuid.uuid4()))
-            code.append(str(uuid.uuid4()))
+            code.append(str(randint(1000000000000000, 9999999999999999)))
             self.code = "-".join(code)
 
     class Meta:
@@ -50,7 +48,7 @@ class invites(models.Model):
         verbose_name_plural = 'Invites'
 
     def __unicode__(self):
-        return unicode(self.code) + "(" + unicode(self.alumni) + ")"
+        return unicode(self.code) + " (" + unicode(self.alumni) + ")"
 
     def __str__(self):
         return self.__unicode__()
@@ -59,8 +57,8 @@ class invites(models.Model):
 class invite_links(models.Model):
     code_to = models.ForeignKey(invites, related_name="invite_links_to")
     code_from = models.ForeignKey(invites, related_name="invite_links_from")
-    is_issued_by = models.BooleanField()
-    is_merged_to = models.BooleanField()
+    is_issued_by = models.BooleanField(default=False)
+    is_merged_to = models.BooleanField(default=False)
     add_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -68,7 +66,7 @@ class invite_links(models.Model):
         verbose_name_plural = 'Invite links'
 
     def __unicode__(self):
-        return unicode(self.code_to) + "->" + unicode(self.code_from)
+        return unicode(self.code_from) + " -> " + unicode(self.code_to)
 
     def __str__(self):
         return self.__unicode__()
