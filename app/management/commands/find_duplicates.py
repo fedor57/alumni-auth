@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
 from collections import defaultdict
 
@@ -21,4 +22,6 @@ class Command(BaseCommand):
                 print("Found duplicate:")
                 for alumnus in duplicates:
                     print(" " * 4 + unicode(alumnus))
+                    if delete and alumnus.letter == u'А':
+                        alumnus.delete()
 

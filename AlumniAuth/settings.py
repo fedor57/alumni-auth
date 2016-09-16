@@ -77,12 +77,26 @@ WSGI_APPLICATION = 'AlumniAuth.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if os.environ.get('APP_ENV', False):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'alumni57',
+            'USER': 'alumni',
+            'PASSWORD': os.environ['APP_PSWD'],
+            'HOST': 'localhost',
+            'OPTIONS': {
+                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+             },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
