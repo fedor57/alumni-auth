@@ -64,15 +64,12 @@ from app.forms import CodeForm
 def askcode(request):
     """Renders the ask code page."""
     assert isinstance(request, HttpRequest)
-    form_class = CodeForm
+    form_class = CodeForm()
     return render(
         request,
         'app/askcode.html',
         {
-            'title':'Ask code',
-            'message':'Do ask code.',
-            'form':form_class,
-            'year':datetime.now().year
+            'form': form_class,
         }
     )
 
