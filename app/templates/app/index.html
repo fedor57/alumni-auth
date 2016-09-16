@@ -1,37 +1,55 @@
-{% extends "app/layout.html" %}
+﻿{% extends "app/layout.html" %}
 
 {% block content %}
 
 <div class="jumbotron">
-    <h1>Django</h1>
-    <p class="lead">Django is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+    <h2>Что это?</h2>
+
+    <p class="lead">
+        Это простая система, с помощью которой выпускники 57-й школы помогут другу другу получить код вида
+    </p>
+    <blockquote>
+        lyc-1817g-pusha-834012543123
+    </blockquote>
+    <p class="lead">
+        Его можно указывать при голосованиях, чтобы ваш голос не пришлось перепроверять.
+    </p>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Django gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://www.djangobook.com/en/2.0/index.html">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Python Tools for Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>
+{% if code %}
+  <h2>{{ alumni_name }}</h2>
+  <p>Ваш код: {{ code }}</p>
+{% endif %}
 
-<div>
-  <a href="/invite/2323232">/invite/2323232</a> | <a href="/invite">/invite</a> | <a href="/api/get_alumni/?term=23232">/api/get_alumni/?term=23232</a>
-</div>
+{% if not code %}
+
+<h3>Если у вас уже есть код</h3>
+<form role="form" action="" method="post" class="form-inline">
+    {% csrf_token %}
+    <input type="text" class="form-control" name="code" value="" placeholder="Ваш код"/>
+    <button type="submit" class="btn btn-default">Проверить</button>
+</form>
+
+<h3>Где взять код?</h3>
+<ul>
+    <li>попросите у друзей-выпускников прислать вам приглашение личным секретным сообщением</li>
+    <li>если у вас нет друзей или у друзей нет кода, не грустите, подождите и попробуйте еще раз</li>
+    <li>если ничего не получилось, напишите побольше о себе на auth.alumni57@gmail.com</li>
+</ul>
+{% endif %}
+
+
+{% if code %}
+<h3>Пригласите знакомых</h3>
+
+<form action="/new-invitation/{{ code }}" method="post">
+    {% csrf_token %}
+    {{ invite_form }}
+    <input type="submit" value="Создать приглашение" />
+</form>
+
+<input type="hidden" value="{{ code }}" class="code" />
+
+{% endif %}
 
 {% endblock %}
