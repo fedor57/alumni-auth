@@ -4,7 +4,7 @@ Definition of models.
 
 # Create your models here.
 from django.db import models
-from translit import translit
+from app.translit import translit
 from random import randint
 
 
@@ -24,8 +24,8 @@ class alumni(models.Model):
     def __unicode__(self):
         return self.full_name + ", " + unicode(self.year) + self.letter
 
-    def __str__(self):
-        return self.__unicode__()
+#    def __str__(self):
+#        return self.__unicode__()
 
 
 class invites(models.Model):
@@ -50,8 +50,8 @@ class invites(models.Model):
     def __unicode__(self):
         return unicode(self.code) + " (" + unicode(self.alumni) + ")"
 
-    def __str__(self):
-        return self.__unicode__()
+#    def __str__(self):
+#        return self.__unicode__()
 
 
 class invite_links(models.Model):
@@ -68,5 +68,5 @@ class invite_links(models.Model):
     def __unicode__(self):
         return unicode(self.code_from) + " -> " + unicode(self.code_to)
 
-    def __str__(self):
-        return self.__unicode__()
+ #   def __str__(self):
+ #       return self.__unicode__()

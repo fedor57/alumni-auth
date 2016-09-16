@@ -17,8 +17,8 @@ admin.autodiscover()
 
 
 urlpatterns = [
-    url(r'^$', app.views.askcode),
-    url(r'^(?P<code>57-[\w\-]+)$', app.views.invite),
+    url(r'^$', app.views.index),
+    url(r'^(?P<code>57-[\w\-]+)$', app.views.index),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
     url(r'^api/generate_code/', app.views.generate_code),
 

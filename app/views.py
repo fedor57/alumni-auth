@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Definition of views.
 """
@@ -59,7 +61,7 @@ def invite(request, code):
         }
     )
 
-from app.forms import CodeForm
+from app.forms import CodeForm, InviteForm
 
 def askcode(request):
     """Renders the ask code page."""
@@ -72,6 +74,27 @@ def askcode(request):
             'form': form_class,
         }
     )
+
+def index(request, code=None):
+    """Renders the ask code page."""
+    assert isinstance(request, HttpRequest)
+    myinvite = None
+    viewdata = {}
+    if (code is not None) and (len(code) > 0):
+        myinvite = Invite.objects.get(code=code)
+    if myinvite is not None:
+        viewdata['code'] = myinvite.code
+        viewdata['alumni_name'] = str(myinvite.alumni)
+        viewdata['invite_form'] = InviteForm()
+    else:
+        viewdata['form'] = CodeForm()
+    viewdata['year'] = datetime.now().year
+    return render(
+        request,
+        'app/index.html',
+        viewdata
+    )
+
 
 import json
 from django.http import HttpResponse
