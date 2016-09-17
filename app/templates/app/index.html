@@ -29,6 +29,9 @@
     <input type="text" class="form-control" name="code" value="" placeholder="Ваш код"/>
     <button type="submit" class="btn btn-default">Проверить</button>
 </form>
+{% if not_found %}
+    <p class="text-danger">Введённый код не найден</p>
+{% endif %}
 
 <h3>Где взять код?</h3>
 <ul>
@@ -42,10 +45,15 @@
 {% if code %}
 <h3>Пригласите знакомых</h3>
 
-<form action="/new-invitation/{{ code }}" method="post">
+<form action="/new-invitation/{{ code }}" method="post" target="_blank" class="form-inline">
     {% csrf_token %}
-    {{ invite_form }}
-    <input type="submit" value="Создать приглашение" />
+    <input type="hidden" name="invitee" value="" class="invitee-id"/>
+    <div class="form-group">
+        {{ invite_form }}
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-default" value="Создать приглашение" />
+    </div>
 </form>
 
 <input type="hidden" value="{{ code }}" class="code" />

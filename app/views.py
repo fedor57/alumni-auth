@@ -4,7 +4,7 @@
 Definition of views.
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
@@ -47,19 +47,6 @@ def about(request):
         }
     )
 
-def invite(request, code):
-    """Renders the invite page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/invite.html',
-        {
-            'title':'Invite',
-            'message':'Invite it.',
-            'year':datetime.now().year,
-            'code':code,
-        }
-    )
 
 from app.forms import CodeForm, InviteForm
 
@@ -80,8 +67,14 @@ def index(request, code=None):
     assert isinstance(request, HttpRequest)
     myinvite = None
     viewdata = {}
-    if (code is not None) and (len(code) > 0):
-        myinvite = Invite.objects.get(code=code)
+    if request.method == 'POST':
+        code = request.POST['code']
+        return redirect('/' + code)
+    if code:
+        try:
+            myinvite = Invite.objects.get(code=code)
+        except:
+            viewdata['not_found'] = True
     if myinvite is not None:
         viewdata['code'] = myinvite.code
         viewdata['alumni_name'] = str(myinvite.alumni)
@@ -102,30 +95,36 @@ from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
 
-def generate_code(request):
-    code = request.GET['code']
-    alumnus_id = request.GET['id']
+def invite(request, code=None):
+    """Renders the invite page."""
+    assert isinstance(request, HttpRequest)
+    code = Invite.objects.get(code=code)
+    invitee = code.alumni
+    link = InviteLink.objects.get(code_to_id=code.id)
+    inviter = link.code_from.alumni
+    return render(
+        request,
+        'app/invite.html',
+        {
+            'code':code,
+        }
+    )
+
+def generate_code(request, code=None):
+    alumnus_id = request.POST['invitee']
     source_code = Invite.objects.get(code=code)
-    inviter = source_code.alumni
     invitee = Alumnus.objects.get(alumnus_id = alumnus_id)
     inv = Invite(alumni_id = alumnus_id)
     inv.save()
     link = InviteLink(code_from=source_code, code_to=inv)
     link.save()
-
-    data = {
-        'code': inv.code,
-        'invitee': unicode(invitee),
-        'invitee_name': invitee.full_name,
-        'inviter': unicode(inviter),
-    }
-    return HttpResponse(json.dumps(data), 'application/json')
+    return redirect('/invite/' + inv.code)
 
 
 def get_alumni(request):
     #if request.is_ajax():
     q = request.GET.get('term', '')
-    als = Alumnus.objects.filter(full_name__icontains = q )[:20]
+    als = Alumnus.objects.filter(full_name__icontains = q)[:20]
     results = []
     for al in als:
         al_json = {}
