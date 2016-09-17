@@ -6,6 +6,8 @@
     <RootNamespace>AlumniAuth</RootNamespace>
     <InterpreterId>{67a79c10-d5e2-4916-971e-f9c0a605ea7b}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <Environment>
+    </Environment>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
