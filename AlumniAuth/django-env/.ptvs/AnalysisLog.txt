@@ -1,4 +1,0 @@
-﻿
-2016-09-14T01:50:03: Start analysis
-2016-09-14T01:50:03: [WARNING] Library was set explicitly - skipping path detection
-2016-09-14T01:50:03: Deleting 0 files
