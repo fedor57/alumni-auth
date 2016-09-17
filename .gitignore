@@ -4,6 +4,12 @@
 # Python
 *.pyc
 *.pyo
+**/__pycache__/
+
+# virtualenv
+**/django-env/
+**/django-env-python2/
+
 
 # User-specific files
 *.suo
