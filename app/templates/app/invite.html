@@ -2,24 +2,33 @@
 
 {% block content %}
 
-<h2>{{ title }}.</h2>
-<h3>{{ message }}</h3>
+<h2>Отправить приглашение</h2>
 
-<h3>Let's invite!</h3>
+<p class="lead">
+Вы, <strong>{{ inviter.full_name }}</strong>, хотите пригласить вашего знакомого выпускника
+<strong>{{ invitee }}</strong> получить код для участия в голосовании.
+</p>
 
-<p>Your code is {{ code }}</p>
+<p><strong><em>Важно!</em></strong></p>
+<ul>
+    <li>нельзя приглашать от имени другого человека</li>
+    <li>вы можете воспользоваться любым каналом связи: почтой, sms, сообщениями Facebook или ВКонтакте, продиктовать по телефону</li>
+    <li>убедитесь, что код получит именно тот самый выпускник, которого вы решили пригласить. В этом ваша ответственность</li>
+    <li>не пользуйтесь открытыми каналами связи для передачи кодов и ссылок, не публикуйте их в соцсетях</li>
+    <li>если вы будете невнимательны или сыграете не по правилам, увы, нам придется все это аннулировать и отключить</li>
+</ul>
 
-<input type="hidden" value="{{ code }}" class="code" />
-
-<div class="ui-widget">
-  <label for="alumni-name">Alumni: </label>
-  <input id="alumni-name" class="alumni-select">
-</div>
-
-<div class="hidden invite">
-    Сообщение для <span class="invitee"></span>:<br/>
-    <textarea style="width:600px; height:300px;" class="invite-text">
-    </textarea>
-</div>
+Выберете сообщение:<br/>
+<textarea style="width:600px; max-width:600px; height:70px;" class="form-control" onclick="this.focus();this.select()">
+http://auth.alumni57.ru/{{ code.code }} - здесь твой код для голосования выпускников 57-й
+</textarea>
+<hr/>
+<textarea style="width:600px; max-width: 600px; height:150px;" class="form-control" onclick="this.focus();this.select()">
+Привет!
+Твой код для голосований выпускников 57-й
+{{ code.code }}
+Подробности есть на сайте
+http://auth.alumni57.ru
+</textarea>
 
 {% endblock %}

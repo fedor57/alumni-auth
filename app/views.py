@@ -106,7 +106,9 @@ def invite(request, code=None):
         request,
         'app/invite.html',
         {
-            'code':code,
+            'code': code,
+            'inviter': inviter,
+            'invitee': invitee,
         }
     )
 
