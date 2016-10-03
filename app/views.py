@@ -9,6 +9,12 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 
+import json
+from django.http import HttpResponse
+from app.models import alumni as Alumnus
+from app.models import invites as Invite
+from app.models import invite_links as InviteLink
+
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
@@ -79,6 +85,7 @@ def index(request, code=None):
         viewdata['code'] = myinvite.code
         viewdata['alumni_name'] = str(myinvite.alumni)
         viewdata['invite_form'] = InviteForm()
+        viewdata['invites'] = InviteLink.objects.select_related('code_to__alumni').filter(code_from=myinvite).order_by('code_to__alumni__full_name')
     else:
         viewdata['form'] = CodeForm()
     viewdata['year'] = datetime.now().year
@@ -88,12 +95,6 @@ def index(request, code=None):
         viewdata
     )
 
-
-import json
-from django.http import HttpResponse
-from app.models import alumni as Alumnus
-from app.models import invites as Invite
-from app.models import invite_links as InviteLink
 
 def invite(request, code=None):
     """Renders the invite page."""
