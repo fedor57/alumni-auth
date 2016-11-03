@@ -23,5 +23,5 @@ class CodeForm(forms.Form):
     code = forms.CharField(required=True)
 
 class InviteForm(forms.Form):
-    alumni_name = forms.CharField(label='Выберите выпускника:', max_length = 200, widget=forms.TextInput(attrs={'class': 'alumni-select form-control'}))
+    alumni_name = forms.CharField(label='Выберите имя и класс выпуска:', max_length = 200, widget=forms.TextInput(attrs={'class': 'alumni-select form-control'}))
 

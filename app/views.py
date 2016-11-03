@@ -84,6 +84,9 @@ def index(request, code=None):
     if myinvite is not None:
         viewdata['code'] = myinvite.code
         viewdata['alumni_name'] = str(myinvite.alumni)
+        invited_by_list = InviteLink.objects.select_related('code_from__alumni').filter(code_to=myinvite).filter(is_issued_by=True).order_by('add_time')
+        if len(invited_by_list) > 0:
+            viewdata['invited_by'] = invited_by_list[0].code_from.alumni
         viewdata['invite_form'] = InviteForm()
         viewdata['invites'] = InviteLink.objects.select_related('code_to__alumni').filter(code_from=myinvite).order_by('code_to__alumni__full_name')
     else:

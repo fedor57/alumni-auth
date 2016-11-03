@@ -7,62 +7,101 @@
 
     <p class="lead">
         Это простая система, с помощью которой выпускники 57-й школы помогут другу другу получить код вида
-    </p>
-    <blockquote>
-        lyc-1817g-pusha-834012543123
-    </blockquote>
-    <p class="lead">
-        Его можно указывать при голосованиях, чтобы ваш голос не пришлось перепроверять.
+        <strong>lyc-1817g-pusha-834012543123</strong>. Его можно указывать, чтобы вас узнали,
+        при голосованиях, подписке на закрытые группы и пр.
     </p>
 </div>
 
 {% if code %}
-  <h2>{{ alumni_name }}</h2>
-  <p>Ваш код: {{ code }}</p>
+<h2>Ваш код</h2>
+<blockquote>
+    <b>{{ code }}</b><br />
+    {{ alumni_name }}
+    {% if invited_by %}
+    <br />(приглашен {{ invited_by }})
+    {% endif %}
+</blockquote>
+
+<p>
+    <strong>Важно!</strong>
+    Если вы не он, то вы не можете пользоваться этой страницей, приглашать знакомых или
+    голосовать этим кодом за другого. Иначе после небольшого разбирательства нам
+    придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
+</p>
+
+<form role="form" action="/new-code" method="post" class="form-inline">
+    {% csrf_token %}
+    <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
+    <button type="submit" class="btn btn-default">Создать собственный код</button>
+</form>
+
+<p>* <i>стоит, если вы готовы его записать и не забыть, а также не хотите, чтобы к вам подглядывали</i></p>
+
 {% endif %}
 
 {% if not code %}
 
-<h3>Если у вас уже есть код</h3>
+<h3>У меня есть код</h3>
 <form role="form" action="" method="post" class="form-inline">
     {% csrf_token %}
-    <input type="text" class="form-control" name="code" value="" placeholder="Ваш код"/>
+    <input type="text" class="form-control" name="code" value="" placeholder="Ваш код" />
     <button type="submit" class="btn btn-default">Проверить</button>
 </form>
 {% if not_found %}
-    <p class="text-danger">Введённый код не найден</p>
+<p class="text-danger">Введённый код не найден</p>
 {% endif %}
 
 <h3>Где взять код?</h3>
 <ul>
     <li>попросите у друзей-выпускников прислать вам приглашение личным секретным сообщением</li>
     <li>если у вас нет друзей или у друзей нет кода, не грустите, подождите и попробуйте еще раз</li>
-    <li>если ничего не получилось, напишите побольше о себе на auth.alumni57@gmail.com</li>
+    <li>если ничего не получилось, напишите побольше о себе на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a></li>
 </ul>
 {% endif %}
 
 
 {% if code %}
-<h3>Пригласите знакомых</h3>
+<h3>Ваши другие приглашения</h3>
+
+<ul>
+    <li>57-xxxxx (пригласил XXXX) (отключить)</li>
+</ul>
+
+<p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
+
+<form role="form" action="/add-code" method="post" class="form-inline">
+    {% csrf_token %}
+    <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
+    <input type="text" class="form-control" name="code-to" value="" placeholder="Еще один код" />
+    <button type="submit" class="btn btn-default">Добавить</button>
+</form>
+
+<p>* <i>добавьте другие приглашения, чтобы все точно знали, что вы - это вы.</i></p>
+
+<h3>Пригласите выпускников</h3>
+
+<p>Помогите знакомым выпускникам поскорее получить код!</p>
 
 <form action="/new-invitation/{{ code }}" method="post" target="_blank" class="form-inline">
     {% csrf_token %}
-    <input type="hidden" name="invitee" value="" class="invitee-id"/>
+    <input type="hidden" name="invitee" value="" class="invitee-id" />
     <div class="form-group">
         {{ invite_form }}
     </div>
     <div class="form-group">
-        <input type="submit" class="btn btn-default" value="Создать приглашение" />
+        <input type="submit" class="btn btn-default" value="Пригласить" />
     </div>
 </form>
+
+<p><i>(если выпускник не нашелся в списке, напишите подробности на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a>, разберемся!)</i></p>
 {% endif %}
 
 {% if invites %}
-<h3>Уже приглашённые</h3>
+<h3>Я пригласил</h3>
 <ul>
-{% for invite in invites %}
+    {% for invite in invites %}
     <li><a href="/invite/{{ invite.code_to.code }}" target="_blank">{{ invite.code_to.alumni }}</a></li>
-{% endfor %}
+    {% endfor %}
 </ul>
 {% endif %}
 

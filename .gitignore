@@ -9,7 +9,8 @@
 # virtualenv
 **/django-env/
 **/django-env-python2/
-
+django-env/
+django-env-python2/
 
 # User-specific files
 *.suo

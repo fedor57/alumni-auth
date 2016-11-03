@@ -8,6 +8,7 @@
     <InterpreterVersion>2.7</InterpreterVersion>
     <Environment>
     </Environment>
+    <WebBrowserPort>9999</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,6 +36,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\forms.py" />
+    <Compile Include="app\management\commands\find_duplicates.py" />
+    <Compile Include="app\management\commands\load_alumni.py" />
+    <Compile Include="app\management\commands\__init__.py" />
+    <Compile Include="app\management\__init__.py" />
     <Compile Include="app\models.py" />
     <Compile Include="app\tests.py" />
     <Compile Include="app\translit.py" />
@@ -49,6 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="app\" />
+    <Folder Include="app\management\" />
+    <Folder Include="app\management\commands\" />
     <Folder Include="app\migrations\" />
     <Folder Include="app\static\" />
     <Folder Include="app\static\app\" />

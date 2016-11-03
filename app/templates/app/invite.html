@@ -2,14 +2,46 @@
 
 {% block content %}
 
-<h2>Отправить приглашение</h2>
+<h2>Приглашение выпускника</h2>
 
 <p class="lead">
-Вы, <strong>{{ inviter.full_name }}</strong>, хотите пригласить вашего знакомого выпускника
-<strong>{{ invitee }}</strong> получить код для участия в голосовании.
+    Меня зовут<br />
+    <strong>{{ inviter.full_name }}</strong>
 </p>
 
-<p><strong><em>Важно!</em></strong></p>
+<p class="lead">
+    Я хочу пригласить моего знакомого выпускника<br/>
+    <strong>{{ invitee }}</strong>
+</p>
+
+
+<p class="lead">
+    получить вот этот код, который поможет ему участвовать в голосованиях<br/>
+    <strong>{{ code.code }}</strong>
+</p>
+
+
+
+<h3>Пошлите сообщение с кодом</h3>
+
+<p><em>* самостоятельно, по любому закрытому каналу связи. Например,</em></p>
+
+<textarea style="width:600px; max-width:600px; height:70px;" class="form-control" onclick="this.focus();this.select()"
+>http://auth.alumni57.ru/{{ code.code }} - здесь твой код для голосования выпускников 57-й</textarea>
+<br/>
+<textarea style="width:600px; max-width: 600px;" rows="10" class="form-control" onclick="this.focus();this.select()"
+>Привет!
+
+Твой код для голосований выпускников 57-й
+
+    {{ code.code }}
+    ({{ code.alumni }})
+
+Подробности есть на сайте: http://auth.alumni57.ru
+
+{{ inviter.full_name }}</textarea>
+
+<h3>Важно!</h3>
 <ul>
     <li>нельзя приглашать от имени другого человека</li>
     <li>вы можете воспользоваться любым каналом связи: почтой, sms, сообщениями Facebook или ВКонтакте, продиктовать по телефону</li>
@@ -17,16 +49,5 @@
     <li>не пользуйтесь открытыми каналами связи для передачи кодов и ссылок, не публикуйте их в соцсетях</li>
     <li>если вы будете невнимательны или сыграете не по правилам, увы, нам придется все это аннулировать и отключить</li>
 </ul>
-
-Выберете сообщение:<br/>
-<textarea style="width:600px; max-width:600px; height:70px;" class="form-control" onclick="this.focus();this.select()">
-http://auth.alumni57.ru/{{ code.code }} - здесь твой код для голосования выпускников 57-й</textarea>
-<hr/>
-<textarea style="width:600px; max-width: 600px; height:150px;" class="form-control" onclick="this.focus();this.select()">
-Привет!
-Твой код для голосований выпускников 57-й
-{{ code.code }}
-Подробности есть на сайте
-http://auth.alumni57.ru</textarea>
 
 {% endblock %}
