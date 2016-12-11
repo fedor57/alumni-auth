@@ -50,6 +50,12 @@ class invites(models.Model):
     def __unicode__(self):
         return unicode(self.code) + " (" + unicode(self.alumni) + ")"
 
+    def safe_form(self):
+        code = self.code[:-16]
+        code += 'x' * 12
+        code += self.code[-4:]
+        return unicode(code)
+
 #    def __str__(self):
 #        return self.__unicode__()
 

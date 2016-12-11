@@ -18,10 +18,9 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', app.views.index),
-    url(r'^(?P<code>57-[\w\-]+)$', app.views.index),
-    url(r'^new-invitation/(?P<code>57-[\w\-]+)$', app.views.generate_code),
-    url(r'^invite/(?P<code>57-[\w\-]+)$', app.views.invite),
+    url(r'^new-invitation$', app.views.generate_code),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
+    url(r'^logout$', app.views.logout),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls))

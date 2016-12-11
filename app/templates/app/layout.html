@@ -19,6 +19,9 @@
       <div class="navbar-header">
         <span class="navbar-brand">Alumni 57</span>
       </div>
+      {% if 'code' in request.session %}
+        <a class="btn btn-default navbar-btn navbar-right" href="/logout">Выйти</a>
+      {% endif %}
     </div>
   </div>
 

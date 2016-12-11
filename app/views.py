@@ -68,17 +68,18 @@ def askcode(request):
         }
     )
 
-def index(request, code=None):
+def index(request):
     """Renders the ask code page."""
     assert isinstance(request, HttpRequest)
     myinvite = None
     viewdata = {}
     if request.method == 'POST':
         code = request.POST['code']
-        return redirect('/' + code)
-    if code:
+        request.session['code'] = code
+        return redirect('/')
+    if 'code' in request.session:
         try:
-            myinvite = Invite.objects.get(code=code)
+            myinvite = Invite.objects.get(code=request.session['code'])
         except:
             viewdata['not_found'] = True
     if myinvite is not None:
@@ -99,32 +100,32 @@ def index(request, code=None):
     )
 
 
-def invite(request, code=None):
-    """Renders the invite page."""
-    assert isinstance(request, HttpRequest)
-    code = Invite.objects.get(code=code)
-    invitee = code.alumni
-    link = InviteLink.objects.get(code_to_id=code.id)
-    inviter = link.code_from.alumni
+def generate_code(request):
+    if 'inv_code' not in request.session:
+        return redirect('/')
+    code = Invite.objects.get(code=request.session['code'])
+    if request.method == 'POST':
+        alumnus_id = request.POST['invitee']
+        invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
+        inv = Invite(alumni_id = alumnus_id)
+        inv.save()
+        link = InviteLink(code_from=code, code_to=inv)
+        link.save()
+        request.session['inv_code'] = inv.code
+        return redirect('/new-invitation')
+    inv_code = Invite.objects.get(code=request.session['inv_code'])
+    invitee = inv_code.alumni
+    inviter = code.alumni
+    del request.session['inv_code']
     return render(
         request,
         'app/invite.html',
         {
-            'code': code,
+            'code': inv_code,
             'inviter': inviter,
             'invitee': invitee,
         }
     )
-
-def generate_code(request, code=None):
-    alumnus_id = request.POST['invitee']
-    source_code = Invite.objects.get(code=code)
-    invitee = Alumnus.objects.get(alumnus_id = alumnus_id)
-    inv = Invite(alumni_id = alumnus_id)
-    inv.save()
-    link = InviteLink(code_from=source_code, code_to=inv)
-    link.save()
-    return redirect('/invite/' + inv.code)
 
 
 def get_alumni(request):
@@ -143,3 +144,10 @@ def get_alumni(request):
     #    data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+
+def logout(request):
+    del request.session['code']
+    if 'inv_code' in request.session:
+        del request.session['inv_code']
+    return redirect('/')

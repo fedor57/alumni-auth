@@ -69,20 +69,11 @@
 
 <p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
 
-<form role="form" action="/add-code" method="post" class="form-inline">
-    {% csrf_token %}
-    <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
-    <input type="text" class="form-control" name="code-to" value="" placeholder="Еще один код" />
-    <button type="submit" class="btn btn-default">Добавить</button>
-</form>
-
-<p>* <i>добавьте другие приглашения, чтобы все точно знали, что вы - это вы.</i></p>
-
 <h3>Пригласите выпускников</h3>
 
 <p>Помогите знакомым выпускникам поскорее получить код!</p>
 
-<form action="/new-invitation/{{ code }}" method="post" target="_blank" class="form-inline">
+<form action="/new-invitation" method="post" target="_blank" class="form-inline">
     {% csrf_token %}
     <input type="hidden" name="invitee" value="" class="invitee-id" />
     <div class="form-group">
@@ -100,7 +91,7 @@
 <h3>Я пригласил</h3>
 <ul>
     {% for invite in invites %}
-    <li><a href="/invite/{{ invite.code_to.code }}" target="_blank">{{ invite.code_to.alumni }}</a></li>
+    <li>{{ invite.code_to.alumni }} ({{ invite.code_to.safe_form }})</li>
     {% endfor %}
 </ul>
 {% endif %}
