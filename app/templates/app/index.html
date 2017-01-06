@@ -73,7 +73,7 @@
 
 <p>Помогите знакомым выпускникам поскорее получить код!</p>
 
-<form action="/new-invitation" method="post" target="_blank" class="form-inline">
+<form action="/invite/new" method="post" target="_blank" class="form-inline">
     {% csrf_token %}
     <input type="hidden" name="invitee" value="" class="invitee-id" />
     <div class="form-group">
