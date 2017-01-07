@@ -2,37 +2,44 @@
 
 {% block content %}
 
-<div class="jumbotron">
-    <h2>Что это?</h2>
+<div class="hidden" id="what-is-this">
+  <a class="btn btn-default btn-lg" role="button">Что это?</a>
+</div>
 
-    <p class="lead">
-        Это простая система, с помощью которой выпускники 57-й школы помогут другу другу получить код вида
-        <strong>lyc-1817g-pusha-834012543123</strong>. Его можно указывать, чтобы вас узнали,
-        при голосованиях, подписке на закрытые группы и пр.
-    </p>
+<div class="jumbotron" id="about">
+  <h2>Что это?</h2>
+
+  <p class="lead">
+    Это простая система, с помощью которой выпускники 57-й школы помогут другу другу получить код вида
+    <strong>lyc-1817g-pusha-834012543123</strong>. Его можно указать, чтобы вас узнали,
+    при голосовании, подписке на закрытые группы и пр.
+  </p>
+
+  <a class="btn btn-primary btn-lg" role="button">Все понятно</a>
+
 </div>
 
 {% if code %}
 <h2>Ваш код</h2>
 <blockquote>
-    <b>{{ code }}</b><br />
-    {{ alumni_name }}
-    {% if invited_by %}
-    <br />(приглашен {{ invited_by }})
-    {% endif %}
+  <b>{{ code }}</b><br />
+  {{ alumni_name }}
+  {% if invited_by %}
+  <br />(пригласил {{ invited_by }})
+  {% endif %}
 </blockquote>
 
 <p>
-    <strong>Важно!</strong>
-    Если вы не он, то вы не можете пользоваться этой страницей, приглашать знакомых или
-    голосовать этим кодом за другого. Иначе после небольшого разбирательства нам
-    придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
+  <strong>Важно!</strong>
+  Если вы не он, то вы не можете пользоваться этой страницей, приглашать знакомых или
+  голосовать этим кодом за другого. Иначе после небольшого разбирательства нам
+  придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
 </p>
 
 <form role="form" action="/new-code" method="post" class="form-inline">
-    {% csrf_token %}
-    <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
-    <button type="submit" class="btn btn-default">Создать собственный код</button>
+  {% csrf_token %}
+  <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
+  <button type="submit" class="btn btn-primary">Создать собственный код</button>
 </form>
 
 <p>* <i>стоит, если вы готовы его записать и не забыть, а также не хотите, чтобы к вам подглядывали</i></p>
@@ -43,9 +50,9 @@
 
 <h3>У меня есть код</h3>
 <form role="form" action="" method="post" class="form-inline">
-    {% csrf_token %}
-    <input type="text" class="form-control" name="code" value="" placeholder="Ваш код" />
-    <button type="submit" class="btn btn-default">Проверить</button>
+  {% csrf_token %}
+  <input type="text" class="form-control" name="code" value="" placeholder="Ваш код" />
+  <button type="submit" class="btn btn-primary">Проверить</button>
 </form>
 {% if not_found %}
 <p class="text-danger">Введённый код не найден</p>
@@ -53,9 +60,9 @@
 
 <h3>Где взять код?</h3>
 <ul>
-    <li>попросите у друзей-выпускников прислать вам приглашение личным секретным сообщением</li>
-    <li>если у вас нет друзей или у друзей нет кода, не грустите, подождите и попробуйте еще раз</li>
-    <li>если ничего не получилось, напишите побольше о себе на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a></li>
+  <li>попросите у друзей-выпускников прислать вам приглашение личным секретным сообщением</li>
+  <li>если у вас нет друзей или у друзей нет кода, не грустите, подождите и попробуйте еще раз</li>
+  <li>если ничего не получилось, напишите побольше о себе на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a></li>
 </ul>
 {% endif %}
 
@@ -64,7 +71,7 @@
 <h3>Ваши другие приглашения</h3>
 
 <ul>
-    <li>57-xxxxx (пригласил XXXX) (отключить)</li>
+  <li>57-xxxxx (пригласил XXXX) (отключить)</li>
 </ul>
 
 <p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
@@ -74,14 +81,14 @@
 <p>Помогите знакомым выпускникам поскорее получить код!</p>
 
 <form action="/invite/new" method="post" target="_blank" class="form-inline">
-    {% csrf_token %}
-    <input type="hidden" name="invitee" value="" class="invitee-id" />
-    <div class="form-group">
-        {{ invite_form }}
-    </div>
-    <div class="form-group">
-        <input type="submit" class="btn btn-default" value="Пригласить" />
-    </div>
+  {% csrf_token %}
+  <input type="hidden" name="invitee" value="" class="invitee-id" />
+  <div class="form-group">
+    {{ invite_form }}
+  </div>
+  <div class="form-group">
+    <input type="submit" class="btn btn-primary" value="Пригласить" />
+  </div>
 </form>
 
 <p><i>(если выпускник не нашелся в списке, напишите подробности на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a>, разберемся!)</i></p>
@@ -90,9 +97,9 @@
 {% if invites %}
 <h3>Я пригласил</h3>
 <ul>
-    {% for invite in invites %}
-    <li>{{ invite.code_to.alumni }} ({{ invite.code_to.safe_form }})</li>
-    {% endfor %}
+  {% for invite in invites %}
+  <li>{{ invite.code_to.alumni }} ({{ invite.code_to.safe_form }})</li>
+  {% endfor %}
 </ul>
 {% endif %}
 

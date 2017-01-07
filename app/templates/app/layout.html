@@ -11,13 +11,14 @@
   <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
   <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
   <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
+  <script src="{% static 'app/scripts/js.cookie.js' %}"></script>
 </head>
 
 <body>
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <span class="navbar-brand">Alumni 57</span>
+        <span class="navbar-brand">Выпускники 57 - коды доступа</span>
       </div>
       {% if 'code' in request.session %}
         <a class="btn btn-default navbar-btn navbar-right" href="/logout">Выйти</a>

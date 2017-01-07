@@ -69,6 +69,7 @@
   <ItemGroup>
     <Content Include="alumni57-auth-ui.md" />
     <Content Include="app\static\app\scripts\appl.js" />
+    <Content Include="app\static\app\scripts\js.cookie.js" />
     <Content Include="app\templates\app\contact.html" />
     <Content Include="app\templates\app\askcode.html" />
     <Content Include="msdev-readme.mht" />
