@@ -84,13 +84,19 @@ def index(request, code_param = ''):
         except:
             viewdata['not_found'] = True
     if myinvite is not None:
-        viewdata['code'] = myinvite.code
+        viewdata['code'] = myinvite.safe_form
         viewdata['alumni_name'] = str(myinvite.alumni)
         invited_by_list = InviteLink.objects.select_related('code_from__alumni').filter(code_to=myinvite).filter(is_issued_by=True).order_by('add_time')
         if len(invited_by_list) > 0:
             viewdata['invited_by'] = invited_by_list[0].code_from.alumni
         viewdata['invite_form'] = InviteForm()
-        viewdata['invites'] = InviteLink.objects.select_related('code_to__alumni').filter(code_from=myinvite).order_by('code_to__alumni__full_name')
+        other_invites = []
+        for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
+            invited_by = InviteLink.objects.select_related('code_from__alumni').filter(code_to=invite).filter(is_issued_by=True).order_by('add_time')
+            invite.by = invited_by[0].code_from.alumni
+            invite.at = invited_by[0].add_time.strftime('%d.%m.%y')
+            other_invites.append(invite)
+        viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
     viewdata['year'] = datetime.now().year
@@ -132,13 +138,13 @@ def invite(request, inv_idx):
         except:
             myinvite = None
     if myinvite is None:
-        return redirect('/')
+        return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
     inv_codes = None
     if 'inv_codes' in request.session:
         inv_codes = request.session['inv_codes']
     inv_idx = int(inv_idx)
     if inv_codes is None or inv_idx < 0 or inv_idx >= len(inv_codes):
-        return redirect('/')
+        return HttpResponseNotFound('<h1>Приглашение не найдено, откройте страницу заново</h1>')
 
     inv_code = Invite.objects.get(code=inv_codes[inv_idx])
     invitee = inv_code.alumni
