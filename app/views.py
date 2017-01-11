@@ -3,58 +3,19 @@
 """
 Definition of views.
 """
+import json
 
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 
-import json
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
-
-def home(request):
-    """Renders the home page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/index.html',
-        {
-            'title':'Home Page',
-            'year':datetime.now().year,
-        }
-    )
-
-def contact(request):
-    """Renders the contact page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/contact.html',
-        {
-            'title':'Contact',
-            'message':'Your contact page.',
-            'year':datetime.now().year,
-        }
-    )
-
-def about(request):
-    """Renders the about page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/about.html',
-        {
-            'title':'About',
-            'message':'Your application description page.',
-            'year':datetime.now().year,
-        }
-    )
-
-
 from app.forms import CodeForm, InviteForm
+
 
 def askcode(request):
     """Renders the ask code page."""
@@ -96,12 +57,17 @@ def index(request, code_param = ''):
             is_issued_by=True
         ).order_by('code_to__alumni__full_name')
         other_invites = []
+        active_codes = request.session.get('codes', [])
         for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
+            if invite == myinvite:
+                continue
             invited_by = InviteLink.objects.select_related('code_from__alumni').filter(code_to=invite, is_issued_by=True).order_by('add_time')
             if len(invited_by):
                 invite.by = invited_by[0].code_from.alumni
                 invite.at = invited_by[0].add_time.strftime('%d.%m.%y')
-                other_invites.append(invite)
+            if invite.code in active_codes:
+                invite.activate = active_codes.index(invite.code)
+            other_invites.append(invite)
         viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
@@ -177,6 +143,13 @@ def invite(request, inv_idx, self_issued=False):
             'invitee': invitee,
         }
     )
+
+
+def switch(request, inv_idx):
+    inv_idx = int(inv_idx)
+    old_code = request.session['code']
+    request.session['code'], request.session['codes'][inv_idx] = request.session['codes'][inv_idx], request.session['code']
+    return redirect('/')
 
 
 def get_alumni(request):

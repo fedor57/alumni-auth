@@ -36,7 +36,7 @@
   придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
 </p>
 
-<form role="form" action="/new-code/" method="post" target="_blank" class="form-inline">
+<form role="form" action="/new-code" method="post" target="_blank" class="form-inline">
   {% csrf_token %}
   <input type="hidden" name="invitee" value="{{ alumnus_id }}" class="code-from" />
   <button type="submit" class="btn btn-primary">Создать собственный код</button>
@@ -70,13 +70,28 @@
 {% if code %}
 <h3>Ваши другие приглашения</h3>
 
+{{ request.session.codes }}
+
 <ul>
   {% for invite in other_invites %}
-  <li>{{ invite.safe_form }} (пригласил {{ invite.at }} - {{ invite.by }}) (отключить)</li>
+      <li>{{ invite.safe_form }} {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}{% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}(отключить)</li>
   {% endfor %}
 </ul>
 
 <p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
+
+<p>Введите ваши другие коды, чтобы было точно понятно, что вы — это вы:</p>
+
+<form action="/invite/new" method="post" target="_blank" class="form-inline">
+  {% csrf_token %}
+  <input type="hidden" name="invitee" value="" class="invitee-id" />
+  <div class="form-group">
+      <input type="text" class="form-control" name="other_code" placeholder="Другой код" size="100"/>
+  </div>
+  <div class="form-group">
+    <input type="submit" class="btn btn-primary" value="Ввести" />
+  </div>
+</form>
 
 <h3>Пригласите выпускников</h3>
 
