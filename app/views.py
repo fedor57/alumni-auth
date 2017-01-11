@@ -10,7 +10,7 @@ from django.template import RequestContext
 from datetime import datetime
 
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
@@ -85,17 +85,23 @@ def index(request, code_param = ''):
             viewdata['not_found'] = True
     if myinvite is not None:
         viewdata['code'] = myinvite.safe_form
+        viewdata['alumnus_id'] = myinvite.alumni_id
         viewdata['alumni_name'] = str(myinvite.alumni)
-        invited_by_list = InviteLink.objects.select_related('code_from__alumni').filter(code_to=myinvite).filter(is_issued_by=True).order_by('add_time')
+        invited_by_list = InviteLink.objects.select_related('code_from__alumni').filter(code_to=myinvite, is_issued_by=True).order_by('add_time')
         if len(invited_by_list) > 0:
             viewdata['invited_by'] = invited_by_list[0].code_from.alumni
         viewdata['invite_form'] = InviteForm()
+        viewdata['invites'] = InviteLink.objects.select_related('code_to__alumni').filter(
+            code_from=myinvite,
+            is_issued_by=True
+        ).order_by('code_to__alumni__full_name')
         other_invites = []
         for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
-            invited_by = InviteLink.objects.select_related('code_from__alumni').filter(code_to=invite).filter(is_issued_by=True).order_by('add_time')
-            invite.by = invited_by[0].code_from.alumni
-            invite.at = invited_by[0].add_time.strftime('%d.%m.%y')
-            other_invites.append(invite)
+            invited_by = InviteLink.objects.select_related('code_from__alumni').filter(code_to=invite, is_issued_by=True).order_by('add_time')
+            if len(invited_by):
+                invite.by = invited_by[0].code_from.alumni
+                invite.at = invited_by[0].add_time.strftime('%d.%m.%y')
+                other_invites.append(invite)
         viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
@@ -118,19 +124,28 @@ def generate_code(request):
             myinvite = None
     if myinvite is None:
         return redirect('/')
-    alumnus_id = request.POST['invitee']
+    alumnus_id = int(request.POST['invitee'])
     invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
     invite = Invite(alumni_id = alumnus_id)
     invite.save()
     link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True)
     link.save()
+
+    if invite.alumni_id == myinvite.alumni_id:
+        if 'codes' not in request.session:
+            request.session['codes'] = []
+        idx = len(request.session['codes'])
+        request.session['codes'].append(invite.code)
+        return redirect('/code/' + str(idx))
+
     if 'inv_codes' not in request.session:
         request.session['inv_codes'] = []
     inv_idx = len(request.session['inv_codes'])
-    request.session['inv_codes'].append(invite.code) 
+    request.session['inv_codes'].append(invite.code)
     return redirect('/invite/' + str(inv_idx))
 
-def invite(request, inv_idx):
+
+def invite(request, inv_idx, self_issued=False):
     myinvite = None
     if 'code' in request.session:
         try:
@@ -139,14 +154,18 @@ def invite(request, inv_idx):
             myinvite = None
     if myinvite is None:
         return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
-    inv_codes = None
-    if 'inv_codes' in request.session:
-        inv_codes = request.session['inv_codes']
+    if self_issued:
+        inv_codes = request.session.get('codes', None)
+    else:
+        inv_codes = request.session.get('inv_codes', None)
+
     inv_idx = int(inv_idx)
     if inv_codes is None or inv_idx < 0 or inv_idx >= len(inv_codes):
         return HttpResponseNotFound('<h1>Приглашение не найдено, откройте страницу заново</h1>')
 
     inv_code = Invite.objects.get(code=inv_codes[inv_idx])
+    if self_issued:
+        return render(request, 'app/code.html', {'code': inv_code})
     invitee = inv_code.alumni
     inviter = myinvite.alumni
     return render(
@@ -182,4 +201,6 @@ def logout(request):
     del request.session['code']
     if 'inv_codes' in request.session:
         del request.session['inv_codes']
+    if 'codes' in request.session:
+        del request.session['codes']
     return redirect('/')

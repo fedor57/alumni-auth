@@ -36,9 +36,9 @@
   придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
 </p>
 
-<form role="form" action="/new-code" method="post" class="form-inline">
+<form role="form" action="/new-code/" method="post" target="_blank" class="form-inline">
   {% csrf_token %}
-  <input type="hidden" name="code-from" value="{{ code }}" class="code-from" />
+  <input type="hidden" name="invitee" value="{{ alumnus_id }}" class="code-from" />
   <button type="submit" class="btn btn-primary">Создать собственный код</button>
 </form>
 
