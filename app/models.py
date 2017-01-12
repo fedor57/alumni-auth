@@ -30,9 +30,18 @@ class alumni(models.Model):
 
 class invites(models.Model):
     PREFIX = '57'
+    STATUS_OK = 1
+    STATUS_DISABLED = 2
+    STATUSES = (
+        (1, 'OK'),
+        (2, 'DISABLED'),
+    )
+
     code = models.CharField(max_length=255)
     alumni = models.ForeignKey(alumni)
     add_time = models.DateTimeField(auto_now_add=True)
+    status = models.SmallIntegerField(choices=STATUSES, default=STATUS_OK)
+    disabled_at = models.DateTimeField(null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(invites, self).__init__(*args, **kwargs)
@@ -55,6 +64,9 @@ class invites(models.Model):
         code += 'x' * 12
         code += self.code[-4:]
         return unicode(code)
+
+    def is_disabled(self):
+        return self.status == self.STATUS_DISABLED
 
 #    def __str__(self):
 #        return self.__unicode__()

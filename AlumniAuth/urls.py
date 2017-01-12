@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^new-code$', app.views.generate_code),
     url(r'^code/(?P<inv_idx>\d+)$', app.views.invite, {'self_issued': True}),
     url(r'^switch/(?P<inv_idx>\d+)$', app.views.switch),
+    url(r'^disable/(?P<inv_idx>\d+)$', app.views.disable),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
     url(r'^logout$', app.views.logout),
 

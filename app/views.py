@@ -37,20 +37,35 @@ def index(request, code_param = ''):
     if request.method == 'POST':
         code_param = request.POST['code']
         if code_param is not None and len(code_param) > 0:
-            myinvite = Invite.objects.get(code=code_param)
-            if request.session.get('code', None):
-                if 'codes' not in request.session:
-                    request.session['codes'] = []
-                request.session['codes'].append(code_param)
-            else:
-                request.session['code'] = code_param
-            request.session.save()
-            return redirect('/')
+            try:
+                myinvite = Invite.objects.get(code=code_param)
+            except:
+                request.session['not_found'] = True
+            if myinvite:
+                if myinvite.is_disabled():
+                    request.session['disabled'] = True
+                else:
+                    if request.session.get('code', None):
+                        if 'codes' not in request.session:
+                            request.session['codes'] = []
+                        request.session['codes'].append(code_param)
+                    else:
+                        request.session['code'] = code_param
+                    request.session.save()
+        else:
+            request.session['not_found'] = True
+        return redirect('/')
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
         except:
             viewdata['not_found'] = True
+    if 'not_found' in request.session:
+        viewdata['not_found'] = True
+        del request.session['not_found']
+    if 'disabled' in request.session:
+        viewdata['code_disabled'] = True
+        del request.session['disabled']
     if myinvite is not None:
         viewdata['code'] = myinvite.safe_form
         viewdata['alumnus_id'] = myinvite.alumni_id
@@ -63,6 +78,7 @@ def index(request, code_param = ''):
             code_from=myinvite,
             is_issued_by=True
         ).order_by('code_to__alumni__full_name')
+        viewdata['invites'] = filter(lambda x: x.code_to.alumni != myinvite.alumni, viewdata['invites'])
         other_invites = []
         active_codes = request.session.get('codes', [])
         for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
@@ -156,8 +172,18 @@ def invite(request, inv_idx, self_issued=False):
 
 def switch(request, inv_idx):
     inv_idx = int(inv_idx)
-    old_code = request.session['code']
     request.session['code'], request.session['codes'][inv_idx] = request.session['codes'][inv_idx], request.session['code']
+    return redirect('/')
+
+
+def disable(request, inv_idx):
+    inv_idx = int(inv_idx)
+    inv = Invite.objects.get(code=request.session['codes'][inv_idx])
+    inv.status = Invite.STATUS_DISABLED
+    inv.disabled_at = datetime.now()
+    inv.save()
+    del request.session['codes'][inv_idx]
+    request.session.save()
     return redirect('/')
 
 

@@ -57,6 +57,9 @@
 {% if not_found %}
 <p class="text-danger">Введённый код не найден</p>
 {% endif %}
+{% if code_disabled %}
+<p class="text-danger">Введённый код отключён</p>
+{% endif %}
 
 <h3>Где взять код?</h3>
 <ul>
@@ -73,17 +76,20 @@
 <ul>
   {% for invite in other_invites %}
     <li>
-        {{ invite.safe_form }}
+        {% if invite.is_disabled %}<s>{% endif %}{{ invite.safe_form }}{% if invite.is_disabled %}</s>{% endif %}
         {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
-        {% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}
-        (отключить)
+        {% if not invite.is_disabled %}
+            {% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}
+            {% if invite.activate is not None %}(<a href="/disable/{{ invite.activate }}">отключить</a>){% endif %}
+        {% endif %}
+        {% if invite.is_disabled %}<i>отключён</i>{% endif %}
     </li>
   {% endfor %}
 </ul>
 
 <p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
 
-<p>Введите ваши другие коды, чтобы было точно понятно, что вы — это вы:</p>
+<p>Введите ваши другие коды, чтобы управлять ими и чтобы было точно понятно, что вы — это вы:</p>
 
 <form action="" method="post" class="form-inline">
   {% csrf_token %}
@@ -94,6 +100,14 @@
     <input type="submit" class="btn btn-primary" value="Ввести" />
   </div>
 </form>
+
+{% if not_found %}
+<p class="text-danger">Введённый код не найден</p>
+{% endif %}
+
+{% if code_disabled %}
+<p class="text-danger">Введённый код отключён</p>
+{% endif %}
 
 <h3>Пригласите выпускников</h3>
 
