@@ -138,3 +138,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+
+
+
+# Session
+SESSION_COOKIE_AGE = 2419200
+
+
+
