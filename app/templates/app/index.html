@@ -70,11 +70,14 @@
 {% if code %}
 <h3>Ваши другие приглашения</h3>
 
-{{ request.session.codes }}
-
 <ul>
   {% for invite in other_invites %}
-      <li>{{ invite.safe_form }} {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}{% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}(отключить)</li>
+    <li>
+        {{ invite.safe_form }}
+        {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+        {% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}
+        (отключить)
+    </li>
   {% endfor %}
 </ul>
 
@@ -82,11 +85,10 @@
 
 <p>Введите ваши другие коды, чтобы было точно понятно, что вы — это вы:</p>
 
-<form action="/invite/new" method="post" target="_blank" class="form-inline">
+<form action="" method="post" class="form-inline">
   {% csrf_token %}
-  <input type="hidden" name="invitee" value="" class="invitee-id" />
   <div class="form-group">
-      <input type="text" class="form-control" name="other_code" placeholder="Другой код" size="100"/>
+      <input type="text" class="form-control" name="code" placeholder="Другой код" size="100"/>
   </div>
   <div class="form-group">
     <input type="submit" class="btn btn-primary" value="Ввести" />

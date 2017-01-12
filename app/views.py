@@ -36,9 +36,16 @@ def index(request, code_param = ''):
     viewdata = {}
     if request.method == 'POST':
         code_param = request.POST['code']
-    if code_param is not None and len(code_param) > 0:
-        request.session['code'] = code_param
-        return redirect('/')
+        if code_param is not None and len(code_param) > 0:
+            myinvite = Invite.objects.get(code=code_param)
+            if request.session.get('code', None):
+                if 'codes' not in request.session:
+                    request.session['codes'] = []
+                request.session['codes'].append(code_param)
+            else:
+                request.session['code'] = code_param
+            request.session.save()
+            return redirect('/')
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
@@ -102,12 +109,14 @@ def generate_code(request):
             request.session['codes'] = []
         idx = len(request.session['codes'])
         request.session['codes'].append(invite.code)
+        request.session.save()
         return redirect('/code/' + str(idx))
 
     if 'inv_codes' not in request.session:
         request.session['inv_codes'] = []
     inv_idx = len(request.session['inv_codes'])
     request.session['inv_codes'].append(invite.code)
+    request.session.save()
     return redirect('/invite/' + str(inv_idx))
 
 
