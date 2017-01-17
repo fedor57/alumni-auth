@@ -1,13 +1,3 @@
-$(function () {
-    $(".alumni-select").autocomplete({
-        source: "/api/get_alumni/",
-        minLength: 2,
-        select: function(event, ui) {
-            $('.invitee-id').val(ui.item.id);
-        }
-    });
-});
-
 function getIntCookie(name, def)
 {
     var val = Cookies.get(name);
@@ -36,5 +26,35 @@ $(document).ready(function () {
         $(this).addClass('hidden');
         $("#about").removeClass('hidden');
         Cookies.set('about', 1);
+    });
+
+    $(".alumni-select").autocomplete({
+        source: "/api/get_alumni/",
+        minLength: 2,
+        select: function (event, ui) {
+            $('.invitee-id').val(ui.item.id);
+        }
+    });
+
+    $("#create-own-code").popover({
+        trigger: 'hover',
+        placement: 'right'
+    });
+    $("#this-is-important").popover({
+        trigger: 'hover',
+        placement: 'right'
+    });
+    $(".disable-code-link").popover({
+        trigger: 'hover',
+        placement: 'right',
+    });
+    $(".input-code-link").popover({
+        trigger: 'hover',
+        placement: 'right',
+    });
+    $("#input-code-form").hide();
+    $(".input-code-link").click(function () {
+        $("#input-code-form").show();
+        $("#input-code-box").focus();
     });
 });

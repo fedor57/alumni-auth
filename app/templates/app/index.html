@@ -22,27 +22,33 @@
 {% if code %}
 <h2>Ваш код</h2>
 <blockquote>
-  <b>{{ code }}</b><br />
-  {{ alumni_name }}
+  <h3>
+    {{ code }}<br />
+    {{ alumni_name }}
+  </h3>
   {% if invited_by %}
-  <br />(пригласил {{ invited_by }})
+    <p><em>пригласил {{ invited_by }}</em></p>
   {% endif %}
 </blockquote>
 
 <p>
-  <strong>Важно!</strong>
-  Если вы не он, то вы не можете пользоваться этой страницей, приглашать знакомых или
-  голосовать этим кодом за другого. Иначе после небольшого разбирательства нам
-  придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.
+  <a href="#" class="text-primary" id="this-is-important" data-html="true"
+     data-content="<p>Если код выписан не для вас лично, то вы не можете пользоваться этой страницей, а также этим кодом в любых других местах.</p><p>Иначе после небольшого разбирательства нам придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.</p>"
+     title="Важно!">
+     <strong>Это не вы?</strong>
+  </a>
 </p>
+
+
 
 <form role="form" action="/new-code" method="post" target="_blank" class="form-inline">
   {% csrf_token %}
   <input type="hidden" name="invitee" value="{{ alumnus_id }}" class="code-from" />
-  <button type="submit" class="btn btn-primary">Создать собственный код</button>
+  <button type="submit" class="btn btn-primary" data-html="true"
+          id="create-own-code"
+          data-content="<p>Стоит, чтобы впредь пользоваться кодом, который никто больше не знает.</p><p>Новый код нужно обязательно записать. После отключите старые, если они кому-то еще известны.</p>"
+          title="Создать себе новый код">Создать себе новый код</button>
 </form>
-
-<p>* <i>стоит, если вы готовы его записать и не забыть, а также не хотите, чтобы к вам подглядывали</i></p>
 
 {% endif %}
 
@@ -71,30 +77,43 @@
 
 
 {% if code %}
-<h3>Ваши другие приглашения</h3>
+<h3>Вас пригласили</h3>
 
 <ul>
   {% for invite in other_invites %}
-    <li>
-        {% if invite.is_disabled %}<s>{% endif %}{{ invite.safe_form }}{% if invite.is_disabled %}</s>{% endif %}
-        {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
-        {% if not invite.is_disabled %}
-            {% if invite.activate is not None %}(<a href="/switch/{{ invite.activate }}">переключиться</a>) {% endif %}
-            {% if invite.activate is not None %}(<a href="/disable/{{ invite.activate }}">отключить</a>){% endif %}
+  <li>
+    {% if invite.is_disabled %}<s>
+      {% endif %}
+      {% if invite.activate %}<a href="/switch/{{ invite.activate }}">
         {% endif %}
-        {% if invite.is_disabled %}<i>отключён</i>{% endif %}
-    </li>
+        {{ invite.safe_form }}
+        {% if invite.activate %}
+      </a>{% endif %}
+      {% if invite.is_disabled %}
+    </s>{% endif %}
+    {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+    {% if not invite.is_disabled %}
+      {% if invite.activate %}
+        (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
+            data-title="Отключить лишний код"
+            data-html="true" 
+            data-content="<p>Отключите лишние коды, чтобы ими никто другой не смог воспользоваться в будущем. Перед этим убедитесь, что текущий надежно записан.</p> <p>Отключение кода не влияет на то, чтобы было сделано с его помощью.</p>">отключить</a>)
+      {% endif %}
+      {% if not invite.activate %}
+        <a href="#" class="input-code-link"
+           data-title="Ввести другой код" data-content="Введите коды из других полученных вами личных приглашений, чтобы ими управлять, и чтобы было точно понятно, что вы - это вы">(ввести)
+        </a>
+      {% endif %}
+    {% endif %}
+    {% if invite.is_disabled %}(<i>отключён</i>){% endif %}
+  </li>
   {% endfor %}
 </ul>
 
-<p>* <i>отключите код, чтобы с его помощью никто не мог голосовать и приглашать других от вашего имени</i></p>
-
-<p>Введите ваши другие коды, чтобы управлять ими и чтобы было точно понятно, что вы — это вы:</p>
-
-<form action="" method="post" class="form-inline">
+<form action="" method="post" class="form-inline" id="input-code-form">
   {% csrf_token %}
   <div class="form-group">
-      <input type="text" class="form-control" name="code" placeholder="Другой код" size="100"/>
+      <input type="text" class="form-control" name="code" placeholder="Другой код" size="100" id="input-code-box" />
   </div>
   <div class="form-group">
     <input type="submit" class="btn btn-primary" value="Ввести" />
@@ -128,7 +147,7 @@
 {% endif %}
 
 {% if invites %}
-<h3>Я пригласил</h3>
+<h3>Вы пригласили</h3>
 <ul>
   {% for invite in invites %}
   <li>{{ invite.code_to.alumni }} ({{ invite.code_to.safe_form }})</li>
