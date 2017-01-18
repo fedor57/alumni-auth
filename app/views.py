@@ -16,19 +16,6 @@ from app.models import invites as Invite
 from app.models import invite_links as InviteLink
 from app.forms import CodeForm, InviteForm
 
-
-def askcode(request):
-    """Renders the ask code page."""
-    assert isinstance(request, HttpRequest)
-    form_class = CodeForm()
-    return render(
-        request,
-        'app/askcode.html',
-        {
-            'form': form_class,
-        }
-    )
-
 def index(request, code_param = ''):
     """Renders the ask code page."""
     assert isinstance(request, HttpRequest)

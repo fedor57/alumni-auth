@@ -70,7 +70,6 @@
     <Content Include="alumni57-auth-ui.md" />
     <Content Include="app\static\app\scripts\appl.js" />
     <Content Include="app\static\app\scripts\js.cookie.js" />
-    <Content Include="app\templates\app\askcode.html" />
     <Content Include="msdev-readme.mht" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
@@ -99,8 +98,6 @@
     <Content Include="app\templates\app\invite.html" />
     <Content Include="app\templates\app\index.html" />
     <Content Include="app\templates\app\layout.html" />
-    <Content Include="app\templates\app\login.html" />
-    <Content Include="app\templates\app\loginpartial.html" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="django-env-python2\">
