@@ -142,10 +142,19 @@ def invite(request, inv_idx, self_issued=False):
         return HttpResponseNotFound('<h1>Приглашение не найдено, откройте страницу заново</h1>')
 
     inv_code = Invite.objects.get(code=inv_codes[inv_idx])
-    if self_issued:
-        return render(request, 'app/code.html', {'code': inv_code})
     invitee = inv_code.alumni
     inviter = myinvite.alumni
+
+    if self_issued:
+        return render(
+            request, 
+            'app/code.html', 
+            {
+                'code': inv_code, 
+                'alumni_name': str(inviter)
+            }
+        )
+
     return render(
         request,
         'app/invite.html',

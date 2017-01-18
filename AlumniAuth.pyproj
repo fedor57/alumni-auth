@@ -70,6 +70,7 @@
     <Content Include="alumni57-auth-ui.md" />
     <Content Include="app\static\app\scripts\appl.js" />
     <Content Include="app\static\app\scripts\js.cookie.js" />
+    <Content Include="app\templates\app\code.html" />
     <Content Include="msdev-readme.mht" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
