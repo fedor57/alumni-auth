@@ -87,7 +87,11 @@
         {{ invite.safe_form }}
       {% if invite.activate is not None %}</a>{% endif %}
     {% if invite.is_disabled %}</s>{% endif %}
-    {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+    {% if invite.by and invite.by.alumnus_id == alumnus_id %}
+        (выписан себе)
+    {% else %}
+        {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+    {% endif %}
     {% if not invite.is_disabled %}
       {% if invite.activate is not None %}
         (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
