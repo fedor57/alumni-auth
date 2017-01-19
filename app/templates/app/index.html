@@ -71,7 +71,7 @@
 <ul>
   <li>попросите у друзей-выпускников прислать вам приглашение личным секретным сообщением</li>
   <li>если у вас нет друзей или у друзей нет кода, не грустите, подождите и попробуйте еще раз</li>
-  <li>если ничего не получилось, напишите побольше о себе на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a></li>
+  <li>если ничего не получилось, напишите побольше о себе на <a href="mailto:alumni57.ru@gmail.com">alumni57.ru@gmail.com</a></li>
 </ul>
 {% endif %}
 
@@ -82,24 +82,20 @@
 <ul>
   {% for invite in other_invites %}
   <li>
-    {% if invite.is_disabled %}<s>
-      {% endif %}
-      {% if invite.activate %}<a href="/switch/{{ invite.activate }}">
-        {% endif %}
+    {% if invite.is_disabled %}<s>{% endif %}
+      {% if invite.activate is not None %}<a href="/switch/{{ invite.activate }}">{% endif %}
         {{ invite.safe_form }}
-        {% if invite.activate %}
-      </a>{% endif %}
-      {% if invite.is_disabled %}
-    </s>{% endif %}
+      {% if invite.activate is not None %}</a>{% endif %}
+    {% if invite.is_disabled %}</s>{% endif %}
     {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
     {% if not invite.is_disabled %}
-      {% if invite.activate %}
+      {% if invite.activate is not None %}
         (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
             data-title="Отключить лишний код"
-            data-html="true" 
+            data-html="true"
             data-content="<p>Отключите лишние коды, чтобы ими никто другой не смог воспользоваться в будущем. Перед этим убедитесь, что текущий надежно записан.</p> <p>Отключение кода не влияет на то, чтобы было сделано с его помощью.</p>">отключить</a>)
       {% endif %}
-      {% if not invite.activate %}
+      {% if invite.activate is None %}
         <a href="#" class="input-code-link"
            data-title="Ввести другой код" data-content="Введите коды из других полученных вами личных приглашений, чтобы ими управлять, и чтобы было точно понятно, что вы - это вы">(ввести)
         </a>
@@ -143,7 +139,7 @@
   </div>
 </form>
 
-<p><i>(если выпускник не нашелся в списке, напишите подробности на <a href="mailto:auth.alumni57@gmail.com">auth.alumni57@gmail.com</a>, разберемся!)</i></p>
+<p><i>(если выпускник не нашелся в списке, напишите подробности на <a href="mailto:alumni57.ru@gmail.com">alumni57.ru@gmail.com</a>, разберемся!)</i></p>
 {% endif %}
 
 {% if invites %}

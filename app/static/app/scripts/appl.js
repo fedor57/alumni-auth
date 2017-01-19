@@ -57,4 +57,12 @@ $(document).ready(function () {
         $("#input-code-form").show();
         $("#input-code-box").focus();
     });
+
+
+    $('.disable-code-link').click(function(e) {
+        if (!window.confirm('Убедитесь, что у вас записан другой работающий код. Отключенный код нельзя включить обратно. Отключить код?')) {
+            e.preventDefault();
+            return false;
+        }
+    });
 });

@@ -21,6 +21,7 @@ def index(request, code_param = ''):
     assert isinstance(request, HttpRequest)
     myinvite = None
     viewdata = {}
+
     if request.method == 'POST':
         code_param = request.POST['code']
         if code_param is not None and len(code_param) > 0:
@@ -35,24 +36,29 @@ def index(request, code_param = ''):
                     if request.session.get('code', None):
                         if 'codes' not in request.session:
                             request.session['codes'] = []
-                        request.session['codes'].append(code_param)
+                        if code_param not in request.session['codes']:
+                            request.session['codes'].append(code_param)
                     else:
                         request.session['code'] = code_param
-                    request.session.save()
         else:
             request.session['not_found'] = True
+        request.session.modified = True
         return redirect('/')
+
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
         except:
             viewdata['not_found'] = True
+
     if 'not_found' in request.session:
         viewdata['not_found'] = True
         del request.session['not_found']
+
     if 'disabled' in request.session:
         viewdata['code_disabled'] = True
         del request.session['disabled']
+
     if myinvite is not None:
         viewdata['code'] = myinvite.safe_form
         viewdata['alumnus_id'] = myinvite.alumni_id
