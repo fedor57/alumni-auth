@@ -88,9 +88,9 @@
       {% if invite.activate is not None %}</a>{% endif %}
     {% if invite.is_disabled %}</s>{% endif %}
     {% if invite.by and invite.by.alumnus_id == alumnus_id %}
-        (выписан себе)
+      (выписан себе {{ invite.at }})
     {% else %}
-        {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+      {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
     {% endif %}
     {% if not invite.is_disabled %}
       {% if invite.activate is not None %}
@@ -150,7 +150,7 @@
 <h3>Вы пригласили</h3>
 <ul>
   {% for invite in invites %}
-  <li>{{ invite.code_to.alumni }} ({{ invite.code_to.safe_form }})</li>
+  <li>{{ invite.code_to.alumni }} ({{ invite.add_time|date:"d.m.y"}}, код: {{ invite.code_to.safe_form }})</li>
   {% endfor %}
 </ul>
 {% endif %}
