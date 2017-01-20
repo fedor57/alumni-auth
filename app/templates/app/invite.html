@@ -20,14 +20,12 @@
     <strong>{{ code.code }}</strong>
 </p>
 
-
-
 <h3>Пошлите сообщение с кодом</h3>
 
 <p><em>* самостоятельно, по любому закрытому каналу связи. Например,</em></p>
 
 <textarea style="width:600px; max-width:600px; height:70px;" class="form-control" onclick="this.focus();this.select()"
->http://auth.alumni57.ru/{{ code.code }} - здесь твой код для голосования выпускников 57-й</textarea>
+>{{ code.code }} - твой код для голосований выпускников 57-й - http://auth.alumni57.ru/{{ code.code }}</textarea>
 <br/>
 <textarea style="width:600px; max-width: 600px;" rows="10" class="form-control" onclick="this.focus();this.select()"
 >Привет!
@@ -37,7 +35,7 @@
     {{ code.code }}
     ({{ code.alumni }})
 
-Подробности есть на сайте: http://auth.alumni57.ru
+Подробности есть на сайте: http://auth.alumni57.ru/{{ code.code }}
 
 {{ inviter.full_name }}</textarea>
 

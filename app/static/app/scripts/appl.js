@@ -20,12 +20,12 @@ $(document).ready(function () {
     $("#about").click(function (e) {
         $(this).addClass('hidden');
         $("#what-is-this").removeClass('hidden');
-        Cookies.set('about', 0);
+        Cookies.set('about', 0, { expires: 31 });
     });
     $("#what-is-this").click(function (e) {
         $(this).addClass('hidden');
         $("#about").removeClass('hidden');
-        Cookies.set('about', 1);
+        Cookies.set('about', 1, { expires: 31 });
     });
 
     $(".alumni-select").autocomplete({

@@ -11,11 +11,16 @@
 
   <p class="lead">
     Это простая система, с помощью которой выпускники 57-й школы помогут другу другу получить код вида
-    <strong>lyc-1817g-pusha-834012543123</strong>. Его можно указать, чтобы вас узнали,
-    при голосовании, подписке на закрытые группы и пр.
+    <strong>lyc-1817g-pusha-8340125431207923</strong>. Ваш код можно указывать, чтобы вас узнавали
+    при голосованиях, подписании петиций, подписке на закрытые группы и пр.
   </p>
 
-  <a class="btn btn-primary btn-lg" role="button">Все понятно</a>
+  <p class="lead">
+    Если у вас уже есть код, помогите знакомым выпускникам, раздайте им коды через эту страницу. Не переживайте,
+    если пока эти коды негде использовать, они обязательно пригодятся.
+  </p>
+
+  <a class="btn btn-primary btn-lg" role="button">Закрыть</a>
 
 </div>
 
@@ -27,7 +32,7 @@
     {{ alumni_name }}
   </h3>
   {% if invited_by %}
-    <p><em>пригласил {{ invited_by }}</em></p>
+  <p><em>пригласил {{ invited_by }}</em></p>
   {% endif %}
 </blockquote>
 
@@ -35,10 +40,9 @@
   <a href="#" class="text-primary" id="this-is-important" data-html="true"
      data-content="<p>Если код выписан не для вас лично, то вы не можете пользоваться этой страницей, а также этим кодом в любых других местах.</p><p>Иначе после небольшого разбирательства нам придется сказать ай-ай-ай и все, что вы сделаете, аннулировать.</p>"
      title="Важно!">
-     <strong>Это не вы?</strong>
+    <strong>Это не вы?</strong>
   </a>
 </p>
-
 
 
 <form role="form" action="/new-code" method="post" target="_blank" class="form-inline">
@@ -47,7 +51,9 @@
   <button type="submit" class="btn btn-primary" data-html="true"
           id="create-own-code"
           data-content="<p>Стоит, чтобы впредь пользоваться кодом, который никто больше не знает.</p><p>Новый код нужно обязательно записать. После отключите старые, если они кому-то еще известны.</p>"
-          title="Создать себе новый код">Создать себе новый код</button>
+          title="Создать себе новый код">
+    Создать себе новый код
+  </button>
 </form>
 
 {% endif %}
@@ -83,29 +89,33 @@
   {% for invite in other_invites %}
   <li>
     {% spaceless %}
-    {% if invite.is_disabled %}<s>{% endif %}
-      {% if invite.activate is not None %}<a href="/switch/{{ invite.activate }}">{% endif %}
+    {% if invite.is_disabled %}<s>
+      {% endif %}
+      {% if invite.activate is not None %}<a href="/switch/{{ invite.activate }}">
+        {% endif %}
         <span>{{ invite.safe_form }}</span>
-      {% if invite.activate is not None %}</a>{% endif %}
-    {% if invite.is_disabled %}</s>{% endif %}
+        {% if invite.activate is not None %}
+      </a>{% endif %}
+      {% if invite.is_disabled %}
+    </s>{% endif %}
     {% endspaceless %}
     {% if invite.by and invite.by.alumnus_id == alumnus_id %}
-      (выписан себе {{ invite.at }})
+    (выписан себе {{ invite.at }})
     {% else %}
-      {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
+    {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
     {% endif %}
     {% if not invite.is_disabled %}
-      {% if invite.activate is not None %}
-        (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
-            data-title="Отключить лишний код"
-            data-html="true"
-            data-content="<p>Отключите лишние коды, чтобы ими никто другой не смог воспользоваться в будущем. Перед этим убедитесь, что текущий надежно записан.</p> <p>Отключение кода не влияет на то, чтобы было сделано с его помощью.</p>">отключить</a>)
-      {% endif %}
-      {% if invite.activate is None %}
-        (<a href="#" class="input-code-link"
-            data-title="Ввести другой код"
-            data-content="Введите коды из других полученных вами личных приглашений, чтобы ими управлять, и чтобы было точно понятно, что вы - это вы">ввести</a>)
-      {% endif %}
+    {% if invite.activate is not None %}
+    (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
+        data-title="Отключить лишний код"
+        data-html="true"
+        data-content="<p>Отключите лишние коды, чтобы ими никто другой не смог воспользоваться в будущем. Перед этим убедитесь, что текущий надежно записан.</p> <p>Отключение кода не влияет на то, чтобы было сделано с его помощью.</p>">отключить</a>)
+    {% endif %}
+    {% if invite.activate is None %}
+    (<a href="#" class="input-code-link"
+        data-title="Ввести другой код"
+        data-content="Введите коды из других полученных вами личных приглашений, чтобы ими управлять, и чтобы было точно понятно, что вы - это вы">ввести</a>)
+    {% endif %}
     {% endif %}
     {% if invite.is_disabled %}(<i>отключён</i>){% endif %}
   </li>
@@ -115,7 +125,7 @@
 <form action="" method="post" class="form-inline" id="input-code-form">
   {% csrf_token %}
   <div class="form-group">
-      <input type="text" class="form-control" name="code" placeholder="Другой код" size="100" id="input-code-box" />
+    <input type="text" class="form-control" name="code" placeholder="Другой код" size="100" id="input-code-box" />
   </div>
   <div class="form-group">
     <input type="submit" class="btn btn-primary" value="Ввести" />
