@@ -48,7 +48,15 @@ def index(request, code_param = ''):
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
-        except:
+            if 'alumnus_id' in request.session\
+                    and request.session['alumnus_id'] != myinvite.alumni_id\
+                    and not myinvite.is_disabled():
+                        del request.session['code']
+                        if 'codes' in request.session:
+                            del request.session['codes']
+                        return render(request, 'app/alumni_switch.html')
+            request.session['alumnus_id'] = myinvite.alumni_id
+        except Invite.DoesNotExist:
             viewdata['not_found'] = True
 
     if 'not_found' in request.session:
@@ -59,7 +67,7 @@ def index(request, code_param = ''):
         viewdata['code_disabled'] = True
         del request.session['disabled']
 
-    if myinvite is not None:
+    if myinvite and not myinvite.is_disabled():
         viewdata['code'] = myinvite.safe_form
         viewdata['alumnus_id'] = myinvite.alumni_id
         viewdata['alumni_name'] = str(myinvite.alumni)
@@ -87,6 +95,11 @@ def index(request, code_param = ''):
         viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
+        if myinvite:
+            del request.session['code']
+            if 'codes' in request.session:
+                del request.session['codes']
+            viewdata['code_disabled'] = True
     viewdata['year'] = datetime.now().year
     return render(
         request,
