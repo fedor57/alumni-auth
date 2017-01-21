@@ -5,12 +5,11 @@ Definition of views.
 """
 import json
 
-from django.shortcuts import render, redirect
-from django.http import HttpRequest
-from django.template import RequestContext
 from datetime import datetime
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
+from django.shortcuts import render, redirect
+from django.template import RequestContext
 
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
@@ -27,7 +26,7 @@ def index(request, code_param = ''):
         if code_param is not None and len(code_param) > 0:
             try:
                 myinvite = Invite.objects.get(code=code_param)
-            except:
+            except Invite.DoesNotExist:
                 request.session['not_found'] = True
             if myinvite:
                 if myinvite.is_disabled():
@@ -110,21 +109,21 @@ def index(request, code_param = ''):
 
 def generate_code(request):
     if request.method != 'POST':
-        return redirect('/')
+        return HttpResponseNotAllowed(['POST'])
     myinvite = None
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
-        except:
+        except Invite.DoesNotExist:
             myinvite = None
     if myinvite is None:
-        return redirect('/')
+        return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
     alumnus_id = int(request.POST['invitee'])
     try:
         invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
-    except:
-        return redirect('/')
-    invite = Invite(alumni_id = alumnus_id)
+    except Alumnus.DoesNotExist:
+        raise Http404('Invitee not found')
+    invite = Invite(alumni_id=alumnus_id)
     invite.save()
     link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True)
     link.save()
@@ -150,7 +149,7 @@ def invite(request, inv_idx, self_issued=False):
     if 'code' in request.session:
         try:
             myinvite = Invite.objects.get(code=request.session['code'])
-        except:
+        except Invite.DoesNotExist:
             myinvite = None
     if myinvite is None:
         return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
@@ -161,7 +160,7 @@ def invite(request, inv_idx, self_issued=False):
 
     inv_idx = int(inv_idx)
     if inv_codes is None or inv_idx < 0 or inv_idx >= len(inv_codes):
-        return HttpResponseNotFound('<h1>Приглашение не найдено, откройте страницу заново</h1>')
+        raise Http404('Invite not found')
 
     inv_code = Invite.objects.get(code=inv_codes[inv_idx])
     invitee = inv_code.alumni
@@ -206,7 +205,6 @@ def disable(request, inv_idx):
 
 
 def get_alumni(request):
-    #if request.is_ajax():
     q = request.GET.get('term', '')
     als = Alumnus.objects.filter(full_name__icontains = q)[:20]
     results = []
@@ -217,8 +215,6 @@ def get_alumni(request):
         al_json['value'] = al.full_name
         results.append(al_json)
     data = json.dumps(results)
-    #else:
-    #    data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
