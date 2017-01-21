@@ -21,7 +21,10 @@
         <span class="navbar-brand">Выпускники 57 - коды доступа</span>
       </div>
       {% if 'code' in request.session %}
-        <a class="btn btn-default navbar-btn navbar-right" href="/logout">Выйти</a>
+      <form action="/clear" method="post" class="form-inline">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-default navbar-btn navbar-right" value="Выйти" />
+      </form>
       {% endif %}
     </div>
   </div>
