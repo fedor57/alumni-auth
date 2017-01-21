@@ -7,6 +7,8 @@ from django.db import models
 from app.translit import translit
 from random import randint
 
+import re
+
 
 # Each model extends models.Model
 class alumni(models.Model):
@@ -47,7 +49,8 @@ class invites(models.Model):
         super(invites, self).__init__(*args, **kwargs)
         if not self.code and self.alumni_id:
             code = [self.PREFIX, str(self.alumni.year) + translit(self.alumni.letter).lower()]
-            surname, name = self.alumni.full_name.split(' ')
+            full_name = re.sub(r'\([^)]*\)\s+', '', self.alumni.full_name)
+            surname, name = full_name.split(' ', 1)
             code.append(translit(surname[:3]).lower() + translit(name[0]).lower())
             code.append(str(randint(1000000000000000, 9999999999999999)))
             self.code = "-".join(code)
