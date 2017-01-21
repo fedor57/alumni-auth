@@ -120,7 +120,10 @@ def generate_code(request):
     if myinvite is None:
         return redirect('/')
     alumnus_id = int(request.POST['invitee'])
-    invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
+    try:
+        invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
+    except:
+        return redirect('/')
     invite = Invite(alumni_id = alumnus_id)
     invite.save()
     link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True)
