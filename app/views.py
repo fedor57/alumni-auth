@@ -5,11 +5,11 @@ Definition of views.
 """
 import json
 
-from datetime import datetime
 from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.template import RequestContext
+from django.utils import timezone
 
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
@@ -157,7 +157,7 @@ def index(request, code_param = ''):
         viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
-    viewdata['year'] = datetime.now().year
+    viewdata['year'] = timezone.now().year
     return render(
         request,
         'app/index.html',

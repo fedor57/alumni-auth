@@ -3,9 +3,9 @@ Definition of models.
 """
 
 # Create your models here.
-from datetime import datetime
 from random import SystemRandom
 from django.db import models
+from django.utils import timezone
 from app.translit import translit
 
 import re
@@ -74,11 +74,11 @@ class invites(models.Model):
 
     def disable(self, at=None):
         if at is None:
-            at = datetime.now()
+            at = timezone.now()
 
         self.status = self.STATUS_DISABLED
-        if at > datetime.now():
-            at = datetime.now()
+        if at > timezone.now():
+            at = timezone.now()
         if self.disabled_at is None or self.disabled_at > at:
             self.disabled_at = at
 
