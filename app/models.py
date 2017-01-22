@@ -3,6 +3,7 @@ Definition of models.
 """
 
 # Create your models here.
+from datetime import datetime
 from random import SystemRandom
 from django.db import models
 from app.translit import translit
@@ -70,6 +71,16 @@ class invites(models.Model):
 
     def is_disabled(self):
         return self.status == self.STATUS_DISABLED
+
+    def disable(self, at=None):
+        if at is None:
+            at = datetime.now()
+
+        self.status = self.STATUS_DISABLED
+        if at > datetime.now():
+            at = datetime.now()
+        if self.disabled_at is None or self.disabled_at > at:
+            self.disabled_at = at
 
 #    def __str__(self):
 #        return self.__unicode__()

@@ -255,8 +255,7 @@ def disable(request, inv_idx):
         return HttpResponseBadRequest("Code index out of range")
 
     inv = Invite.objects.get(code=request.session['codes'][inv_idx])
-    inv.status = Invite.STATUS_DISABLED
-    inv.disabled_at = datetime.now()
+    inv.disable()
     inv.save()
     del request.session['codes'][inv_idx]
     request.session.modified = True
