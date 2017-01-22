@@ -170,11 +170,18 @@ def generate_code(request):
         return HttpResponseNotAllowed(['POST'])
 
     myinvite = request.code
-    alumnus_id = int(request.POST['invitee'])
+    alumnus_id = request.POST.getlist('invitee')
+    if len(alumnus_id) != 1:
+        return HttpResponseBadRequest("Must pass exactly one value for 'invitee'")
+    try:
+        alumnus_id = int(alumnus_id[0])
+    except ValueError:
+        raise Http404('Invitee not found')
     try:
         invitee = Alumnus.objects.get(alumnus_id=alumnus_id)
     except Alumnus.DoesNotExist:
         raise Http404('Invitee not found')
+
     invite = Invite(alumni_id=alumnus_id)
     invite.save()
     link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True)
@@ -183,14 +190,14 @@ def generate_code(request):
     if invite.alumni_id == myinvite.alumni_id:
         idx = len(request.session['codes'])
         request.session['codes'].append(invite.code)
-        request.session.save()
+        request.session.modified = True
         return redirect('/code/' + str(idx))
 
     if 'inv_codes' not in request.session:
         request.session['inv_codes'] = []
     inv_idx = len(request.session['inv_codes'])
     request.session['inv_codes'].append(invite.code)
-    request.session.save()
+    request.session.modified = True
     return redirect('/invite/' + str(inv_idx))
 
 @code_required
@@ -199,11 +206,12 @@ def invite(request, inv_idx, self_issued=False):
     if self_issued:
         inv_codes = request.session['codes']
     else:
-        inv_codes = request.session.get('inv_codes', None)
+        inv_codes = request.session.get('inv_codes', [])
 
     inv_idx = int(inv_idx)
-    if inv_codes is None or inv_idx < 0 or inv_idx >= len(inv_codes):
-        raise Http404('Invite not found')
+    assert inv_idx >= 0
+    if inv_idx >= len(inv_codes):
+        raise Http404('Code or invite not found')
 
     inv_code = Invite.objects.get(code=inv_codes[inv_idx])
     invitee = inv_code.alumni
@@ -232,18 +240,26 @@ def invite(request, inv_idx, self_issued=False):
 @code_required
 def switch(request, inv_idx):
     inv_idx = int(inv_idx)
+    assert inv_idx >= 0
+    if inv_idx >= len(request.session['codes']):
+        return HttpResponseBadRequest("Code index out of range")
+
     request.session['code'], request.session['codes'][inv_idx] = request.session['codes'][inv_idx], request.session['code']
     return redirect('/')
 
 @code_required
 def disable(request, inv_idx):
     inv_idx = int(inv_idx)
+    assert inv_idx >= 0
+    if inv_idx >= len(request.session['codes']):
+        return HttpResponseBadRequest("Code index out of range")
+
     inv = Invite.objects.get(code=request.session['codes'][inv_idx])
     inv.status = Invite.STATUS_DISABLED
     inv.disabled_at = datetime.now()
     inv.save()
     del request.session['codes'][inv_idx]
-    request.session.save()
+    request.session.modified = True
     return redirect('/')
 
 
