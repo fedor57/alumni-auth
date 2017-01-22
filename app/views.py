@@ -7,7 +7,7 @@ import json
 
 from datetime import datetime
 from django.conf import settings
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 
@@ -36,8 +36,13 @@ def SessionVersionMiddleware(inner):
 def CodeMiddleware(inner):
     """Middleware for code authentication
 
-    If a valid code is present in session['code'], save a corresponding
-    model object to request.code. Pass control to the underlying view."""
+    If a valid enabled code is present in session['code'], save a corresponding
+    model object to request.code. Issue a 403 Forbidden error for disabled
+    codes. Otherwise, pass control to the underlying view.
+
+    Invariant for the inner view: either session['code'] does not exist and
+    request.code is None, or session['code'] designates a valid enabled code
+    and request.code is the corresponding object."""
 
     def outer(request):
         request.code = None
@@ -46,6 +51,9 @@ def CodeMiddleware(inner):
                 request.code = Invite.objects.get(code=request.session['code'])
             except Invite.DoesNotExist:
                 pass
+            if request.code is None or request.code.is_disabled():
+                request.session.flush()
+                return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
         return inner(request)
     return outer
 
@@ -53,7 +61,10 @@ def code_required(inner):
     """Decorate a view function to require authentication
 
     Issue a 403 Forbidden error if a valid code is not present; otherwise, pass
-    control to the underlying view."""
+    control to the underlying view. Requires CodeMiddleware above in the chain.
+
+    Invariant for the inner view: session['code'] designates a valid enabled
+    code and request.code is the corresponding object."""
 
     def outer(request, *args, **named):
         if request.code is None:
@@ -68,41 +79,29 @@ def enter(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
-    code_param = request.POST['code']
-    if code_param is not None and len(code_param) > 0:
-        try:
-            myinvite = Invite.objects.get(code=code_param)
-        except Invite.DoesNotExist:
-            myinvite = None
-            request.session['not_found'] = True
-        if myinvite is not None:
-            if myinvite.is_disabled():
-                request.session['disabled'] = True
-            else:
-                if request.session.get('code', None):
-                    if 'codes' not in request.session:
-                        request.session['codes'] = []
-                    if code_param not in request.session['codes']:
-                        request.session['codes'].append(code_param)
-                else:
-                    request.session['code'] = code_param
-    else:
-        request.session['not_found'] = True
-    request.session.modified = True
+    code_param = request.POST.getlist('code')
+    if len(code_param) != 1:
+        return HttpResponseBadRequest("Must pass exactly one value for 'code'")
+    code_param = code_param[0]
 
-    if 'code' in request.session:
-        try:
-            myinvite = Invite.objects.get(code=request.session['code'])
-            if 'alumnus_id' in request.session\
-                    and request.session['alumnus_id'] != myinvite.alumni_id\
-                    and not myinvite.is_disabled():
-                        del request.session['code']
-                        if 'codes' in request.session:
-                            del request.session['codes']
-                        return render(request, 'app/alumni_switch.html')
-            request.session['alumnus_id'] = myinvite.alumni_id
-        except Invite.DoesNotExist:
-            request.session['not_found'] = True
+    try:
+        new_code = Invite.objects.get(code=code_param)
+    except Invite.DoesNotExist:
+        request.session['not_found'] = True
+    else:
+        if new_code.is_disabled():
+            request.session['disabled'] = True
+        elif request.code == None:
+            # Set new code as primary
+            request.session['code']  = new_code.code
+            request.session['codes'] = []
+        elif request.code.alumni != new_code.alumni:
+            # Forbid mixing codes for different alumni
+            return render(request, 'app/alumni_switch.html', status=403)
+        elif new_code.code not in request.session['codes']:
+            # Add new code to active set
+            request.session['codes'].append(new_code.code)
+            request.session.modified = True
 
     return redirect('/')
 
@@ -112,29 +111,25 @@ def clear(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
-    if 'code' in request.session:
-        del request.session['code']
-    if 'inv_codes' in request.session:
-        del request.session['inv_codes']
-    if 'codes' in request.session:
-        del request.session['codes']
+    request.session.flush()
     return redirect('/')
+
 
 def index(request, code_param = ''):
     """Renders the ask code page."""
     assert isinstance(request, HttpRequest)
+
     myinvite = request.code
     viewdata = {}
 
     if 'not_found' in request.session:
         viewdata['not_found'] = True
         del request.session['not_found']
-
-    if 'disabled' in request.session:
+    elif 'disabled' in request.session:
         viewdata['code_disabled'] = True
         del request.session['disabled']
 
-    if myinvite and not myinvite.is_disabled():
+    if myinvite is not None:
         viewdata['code'] = myinvite.safe_form
         viewdata['alumnus_id'] = myinvite.alumni_id
         viewdata['alumni_name'] = str(myinvite.alumni)
@@ -148,7 +143,7 @@ def index(request, code_param = ''):
         ).order_by('code_to__alumni__full_name')
         viewdata['invites'] = filter(lambda x: x.code_to.alumni != myinvite.alumni, viewdata['invites'])
         other_invites = []
-        active_codes = request.session.get('codes', [])
+        active_codes = request.session['codes']
         for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
             if invite == myinvite:
                 continue
@@ -162,11 +157,6 @@ def index(request, code_param = ''):
         viewdata['other_invites'] = other_invites
     else:
         viewdata['form'] = CodeForm()
-        if myinvite:
-            del request.session['code']
-            if 'codes' in request.session:
-                del request.session['codes']
-            viewdata['code_disabled'] = True
     viewdata['year'] = datetime.now().year
     return render(
         request,
@@ -191,8 +181,6 @@ def generate_code(request):
     link.save()
 
     if invite.alumni_id == myinvite.alumni_id:
-        if 'codes' not in request.session:
-            request.session['codes'] = []
         idx = len(request.session['codes'])
         request.session['codes'].append(invite.code)
         request.session.save()
@@ -209,7 +197,7 @@ def generate_code(request):
 def invite(request, inv_idx, self_issued=False):
     myinvite = request.code
     if self_issued:
-        inv_codes = request.session.get('codes', None)
+        inv_codes = request.session['codes']
     else:
         inv_codes = request.session.get('inv_codes', None)
 
@@ -241,13 +229,13 @@ def invite(request, inv_idx, self_issued=False):
         }
     )
 
-
+@code_required
 def switch(request, inv_idx):
     inv_idx = int(inv_idx)
     request.session['code'], request.session['codes'][inv_idx] = request.session['codes'][inv_idx], request.session['code']
     return redirect('/')
 
-
+@code_required
 def disable(request, inv_idx):
     inv_idx = int(inv_idx)
     inv = Invite.objects.get(code=request.session['codes'][inv_idx])
