@@ -3,12 +3,12 @@ Definition of models.
 """
 
 # Create your models here.
+from random import SystemRandom
 from django.db import models
 from app.translit import translit
-from random import randint
 
 import re
-
+import string
 
 # Each model extends models.Model
 class alumni(models.Model):
@@ -32,6 +32,7 @@ class alumni(models.Model):
 
 class invites(models.Model):
     PREFIX = '57'
+    STRENGTH = 16
     STATUS_OK = 1
     STATUS_DISABLED = 2
     STATUSES = (
@@ -52,7 +53,8 @@ class invites(models.Model):
             full_name = re.sub(r'\([^)]*\)\s+', '', self.alumni.full_name)
             surname, name = full_name.split(' ', 1)
             code.append(translit(surname[:3]).lower() + translit(name[0]).lower())
-            code.append(str(randint(1000000000000000, 9999999999999999)))
+            csprng = SystemRandom()
+            code.append(''.join(csprng.choice(string.digits) for _ in range(self.STRENGTH)))
             self.code = "-".join(code)
 
     class Meta:
@@ -63,9 +65,7 @@ class invites(models.Model):
         return unicode(self.code) + " (" + unicode(self.alumni) + ")"
 
     def safe_form(self):
-        code = self.code[:-16]
-        code += 'x' * 12
-        code += self.code[-4:]
+        code = self.code[:-self.STRENGTH] + 'x' * (self.STRENGTH-4) + self.code[-4:]
         return unicode(code)
 
     def is_disabled(self):
