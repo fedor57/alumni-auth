@@ -223,6 +223,22 @@ def get_alumni(request):
     return HttpResponse(data, mimetype)
 
 
+def check_code(request):
+    code = request.POST.get('code', '')
+    try:
+        inv = Invite.objects.get(code=code)
+    except Invite.DoesNotExist:
+        return HttpResponse(json.dumps({'status': 'invalid'}), 'application/json')
+    result = {
+        'full_name': inv.alumni.full_name,
+        'cross_name': u'{} {}{}'.format(inv.alumni.full_name, inv.alumni.year, inv.alumni.letter),
+        'year': inv.alumni.year,
+        'letter': inv.alumni.letter,
+        'status': inv.status,
+    }
+    return HttpResponse(json.dumps(result), 'application/json')
+
+
 def logout(request):
     del request.session['code']
     if 'inv_codes' in request.session:

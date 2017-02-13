@@ -63,7 +63,7 @@
 <h3>У меня есть код</h3>
 <form role="form" action="" method="post" class="form-inline">
   {% csrf_token %}
-  <input type="text" class="form-control" name="code" value="" autocomplete="off" placeholder="Ваш код" />
+  <input type="text" class="form-control code-input" name="code" value="" autocomplete="off" placeholder="Ваш код" />
   <button type="submit" class="btn btn-primary">Проверить</button>
 </form>
 {% if not_found %}

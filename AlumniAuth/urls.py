@@ -5,6 +5,7 @@ Definition of urls for AlumniAuth.
 from datetime import datetime
 from django.conf.urls import url
 import django.contrib.auth.views
+from django.views.decorators.csrf import csrf_exempt
 
 
 import app.forms
@@ -27,6 +28,8 @@ urlpatterns = [
     url(r'^disable/(?P<inv_idx>\d+)$', app.views.disable),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
     url(r'^logout$', app.views.logout),
+
+    url(r'^api/v1/check_code$', csrf_exempt(app.views.check_code)),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls))

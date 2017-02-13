@@ -10,6 +10,15 @@ function getIntCookie(name, def)
 }
 
 $(document).ready(function () {
+    if (window.location.hash.length > 0) {
+        var input = $('.code-input');
+        if (input.length) {
+            input.val(window.location.hash.substr(1));
+            window.location.hash = '';
+        }
+    }
+
+
     var about = getIntCookie('about', 1);
 
     if (about < 1)
