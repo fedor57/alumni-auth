@@ -71,6 +71,13 @@ class invites(models.Model):
     def is_disabled(self):
         return self.status == self.STATUS_DISABLED
 
+    def verbose_status(self):
+        if self.status == self.STATUS_OK:
+            return 'ok'
+        if self.status == self.STATUS_DISABLED:
+            return 'disabled'
+        return None
+
 #    def __str__(self):
 #        return self.__unicode__()
 
