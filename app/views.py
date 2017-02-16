@@ -49,7 +49,7 @@ def enter(request):
     except Invite.DoesNotExist:
         request.session['not_found'] = True
     else:
-        if new_code.is_disabled():
+        if not new_code.is_enabled():
             request.session['disabled'] = True
         elif request.code == None:
             # Set new code as primary

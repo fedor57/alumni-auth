@@ -41,7 +41,7 @@ def CodeMiddleware(inner):
                 request.code = Invite.objects.get(code=request.session['code'])
             except Invite.DoesNotExist:
                 pass
-            if request.code is None or request.code.is_disabled():
+            if request.code is None or not request.code.is_enabled():
                 request.session.flush()
                 return HttpResponseForbidden('<h1>Похоже, что сеанс истек, войдите заново</h1>')
         return inner(request)

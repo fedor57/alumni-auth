@@ -89,14 +89,14 @@
   {% for invite in other_invites %}
   <li>
     {% spaceless %}
-    {% if invite.is_disabled %}<s>
+    {% if not invite.is_enabled %}<s>
       {% endif %}
       {% if invite.activate is not None %}<a href="/switch/{{ invite.activate }}">
         {% endif %}
         <span>{{ invite.safe_form }}</span>
         {% if invite.activate is not None %}
       </a>{% endif %}
-      {% if invite.is_disabled %}
+      {% if not invite.is_enabled %}
     </s>{% endif %}
     {% endspaceless %}
     {% if invite.by and invite.by.alumnus_id == alumnus_id %}
@@ -104,7 +104,7 @@
     {% else %}
     {% if invite.at %}(пригласил {{ invite.at }} - {{ invite.by }}) {% endif %}
     {% endif %}
-    {% if not invite.is_disabled %}
+    {% if invite.is_enabled %}
     {% if invite.activate is not None %}
     (<a href="/disable/{{ invite.activate }}" class="disable-code-link"
         data-title="Отключить лишний код"
@@ -117,7 +117,7 @@
         data-content="Введите коды из других полученных вами личных приглашений, чтобы ими управлять, и чтобы было точно понятно, что вы - это вы">ввести</a>)
     {% endif %}
     {% endif %}
-    {% if invite.is_disabled %}(<i>отключён</i>){% endif %}
+    {% if not invite.is_enabled %}(<i>отключён</i>){% endif %}
   </li>
   {% endfor %}
 </ul>

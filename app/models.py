@@ -71,8 +71,8 @@ class invites(models.Model):
         code = self.code[:-self.STRENGTH] + 'x' * (self.STRENGTH-4) + self.code[-4:]
         return unicode(code)
 
-    def is_disabled(self):
-        return self.status == self.STATUS_DISABLED
+    def is_enabled(self):
+        return self.status == self.STATUS_OK
 
     def disable(self, at=None):
         if at is None:
@@ -89,6 +89,8 @@ class invites(models.Model):
             return 'ok'
         if self.status == self.STATUS_DISABLED:
             return 'disabled'
+        if self.status == self.STATUS_BANNED:
+            return 'banned'
         return None
 
 #    def __str__(self):
