@@ -84,6 +84,10 @@ class invites(models.Model):
         if self.disabled_at is None or self.disabled_at > at:
             self.disabled_at = at
 
+    def merge_to(self, other_code, session):
+        link = invite_links(code_from=self, code_to=other_code, is_merged_to=True, session=session)
+        link.save()
+
     def verbose_status(self):
         if self.status == self.STATUS_OK:
             return 'ok'

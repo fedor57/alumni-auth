@@ -62,6 +62,7 @@ def enter(request):
             # Add new code to active set
             request.session['codes'].append(new_code.code)
             request.session.modified = True
+            request.code.merge_to(new_code, request.session.session_key)
 
     return redirect('/')
 
@@ -146,7 +147,7 @@ def generate_code(request):
 
     invite = Invite(alumni_id=alumnus_id)
     invite.save()
-    link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True)
+    link = InviteLink(code_from=myinvite, code_to=invite, is_issued_by=True, session=request.session.session_key)
     link.save()
 
     if invite.alumni_id == myinvite.alumni_id:
