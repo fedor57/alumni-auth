@@ -27,7 +27,8 @@ urlpatterns = [
     url(r'^switch/(?P<inv_idx>\d+)$', app.views.switch),
     url(r'^disable/(?P<inv_idx>\d+)$', app.views.disable),
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
-    url(r'^logout$', app.views.logout),
+    url(r'^enter$', app.views.enter),
+    url(r'^clear$', app.views.clear),
 
     url(r'^api/v1/check_code$', csrf_exempt(app.views.check_code)),
 

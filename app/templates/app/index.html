@@ -61,7 +61,7 @@
 {% if not code %}
 
 <h3>У меня есть код</h3>
-<form role="form" action="" method="post" class="form-inline">
+<form role="form" action="/enter" method="post" class="form-inline">
   {% csrf_token %}
   <input type="text" class="form-control code-input" name="code" value="" autocomplete="off" placeholder="Ваш код" />
   <button type="submit" class="btn btn-primary">Проверить</button>
@@ -122,7 +122,7 @@
   {% endfor %}
 </ul>
 
-<form action="" method="post" class="form-inline" id="input-code-form">
+<form action="/enter" method="post" class="form-inline" id="input-code-form">
   {% csrf_token %}
   <div class="form-group">
     <input type="text" class="form-control" name="code" autocomplete="off" placeholder="Другой код" size="100" id="input-code-box" />

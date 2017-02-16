@@ -5,6 +5,7 @@ Definition of models.
 # Create your models here.
 from random import SystemRandom
 from django.db import models
+from django.utils import timezone
 from app.translit import translit
 
 import re
@@ -72,6 +73,16 @@ class invites(models.Model):
 
     def is_disabled(self):
         return self.status == self.STATUS_DISABLED
+
+    def disable(self, at=None):
+        if at is None:
+            at = timezone.now()
+
+        self.status = self.STATUS_DISABLED
+        if at > timezone.now():
+            at = timezone.now()
+        if self.disabled_at is None or self.disabled_at > at:
+            self.disabled_at = at
 
     def verbose_status(self):
         if self.status == self.STATUS_OK:
