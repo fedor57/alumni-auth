@@ -36,9 +36,11 @@ class invites(models.Model):
     STRENGTH = 16
     STATUS_OK = 1
     STATUS_DISABLED = 2
+    STATUS_BANNED = 3
     STATUSES = (
         (1, 'OK'),
         (2, 'DISABLED'),
+        (3, 'BANNED'),
     )
 
     code = models.CharField(max_length=255)
@@ -82,6 +84,13 @@ class invites(models.Model):
         if self.disabled_at is None or self.disabled_at > at:
             self.disabled_at = at
 
+    def verbose_status(self):
+        if self.status == self.STATUS_OK:
+            return 'ok'
+        if self.status == self.STATUS_DISABLED:
+            return 'disabled'
+        return None
+
 #    def __str__(self):
 #        return self.__unicode__()
 
@@ -92,6 +101,7 @@ class invite_links(models.Model):
     is_issued_by = models.BooleanField(default=False)
     is_merged_to = models.BooleanField(default=False)
     add_time = models.DateTimeField(auto_now_add=True)
+    session = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Invite link'

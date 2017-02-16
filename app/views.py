@@ -275,3 +275,22 @@ def get_alumni(request):
     data = json.dumps(results)
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
+
+
+def check_code(request):
+    code = request.POST.get('code', '')
+    try:
+        inv = Invite.objects.get(code=code)
+    except Invite.DoesNotExist:
+        return HttpResponse(json.dumps({'status': 'not_found'}), 'application/json')
+    result = {
+        'full_name': inv.alumni.full_name,
+        'cross_name': u'{} {}{}'.format(inv.alumni.full_name, inv.alumni.year, inv.alumni.letter),
+        'year': inv.alumni.year,
+        'letter': inv.alumni.letter,
+        'status': inv.verbose_status(),
+        'disabled_at': inv.disabled_at,
+    }
+    if inv.disabled_at:
+        result['disabled_at'] = inv.disabled_at.strftime('%Y-%m-%d %H:%M:%S')
+    return HttpResponse(json.dumps(result), 'application/json')
