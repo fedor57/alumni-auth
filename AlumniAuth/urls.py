@@ -19,7 +19,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', app.views.index),
-    url(r'^(?P<code_param>57-.+)$', app.views.index),
+    url(r'^(?P<code_param>57-.+)$', app.views.reroute),
     url(r'^invite/new$', app.views.generate_code),
     url(r'^invite/(?P<inv_idx>\d+)$', app.views.invite),
     url(r'^new-code$', app.views.generate_code),
