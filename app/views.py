@@ -230,7 +230,11 @@ def disable(request, inv_idx):
 
 def get_alumni(request):
     q = request.GET.get('term', '')
-    als = Alumnus.objects.filter(full_name__icontains = q)[:20]
+    terms = q.split()
+    als = Alumnus.objects.all()
+    for term in terms:
+        als = als.filter(full_name__icontains=term)
+    als = als[:20]
     results = []
     for al in als:
         al_json = {}
