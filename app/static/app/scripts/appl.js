@@ -42,6 +42,7 @@ $(document).ready(function () {
         minLength: 2,
         select: function (event, ui) {
             $('.invitee-id').val(ui.item.id);
+            $('.invite-button').removeAttr('disabled');
         }
     });
 
