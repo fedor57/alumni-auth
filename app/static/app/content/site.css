@@ -40,3 +40,9 @@ input[type="checkbox"].input-validation-error {
 .validation-summary-valid {
     display: none;
 }
+
+.question {
+    margin-bottom: 0;
+    margin-top: 2em;
+}
+

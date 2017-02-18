@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title }}</title>
+  <title>Выпускники 57 — коды выпускников</title>
   {% load staticfiles %}
   <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -18,14 +18,19 @@
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <span class="navbar-brand">Выпускники 57 - коды доступа</span>
+        <a class="navbar-brand" href="/">Выпускники 57 — коды выпускников</a>
       </div>
-      {% if 'code' in request.session %}
-      <form action="/clear" method="post" class="form-inline">
-        {% csrf_token %}
-        <input type="submit" class="btn btn-default navbar-btn navbar-right" value="Выйти" />
-      </form>
-      {% endif %}
+      <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+              <li><a href="/qa">Q&A</a></li>
+          </ul>
+          {% if 'code' in request.session %}
+          <form action="/clear" method="post" class="form-inline">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-default navbar-btn navbar-right" value="Выйти" />
+          </form>
+          {% endif %}
+      </div>
     </div>
   </div>
 
@@ -36,7 +41,7 @@
 
   <script src="{% static 'app/scripts/bootstrap.js' %}"></script>
   <script src="{% static 'app/scripts/respond.js' %}"></script>
-  <script src="{% static 'app/scripts/appl.js' %}"></script>
+  <script src="/static/app/scripts/appl.js?v=1"></script>
   {% block scripts %}{% endblock %}
 
 </body>

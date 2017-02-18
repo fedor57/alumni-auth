@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^api/get_alumni/', app.views.get_alumni, name='get_alumni'),
     url(r'^enter$', app.views.enter),
     url(r'^clear$', app.views.clear),
+    url(r'^qa$', app.views.qa),
 
     url(r'^api/v1/check_code$', csrf_exempt(app.views.check_code)),
 

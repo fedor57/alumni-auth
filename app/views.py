@@ -265,6 +265,11 @@ def check_code(request):
         result['disabled_at'] = inv.disabled_at.strftime('%Y-%m-%d %H:%M:%S')
     return HttpResponse(json.dumps(result), 'application/json')
 
+
+def qa(request):
+    return render(request, 'app/qa.html')
+
+
 def reroute(request, *args, **kwargs):
     return redirect('/')
 
