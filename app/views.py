@@ -4,6 +4,7 @@
 Definition of views.
 """
 import json
+import time
 
 from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
@@ -248,6 +249,7 @@ def get_alumni(request):
 
 
 def check_code(request):
+    time.sleep(0.1)
     code = request.POST.get('code', '')
     try:
         inv = Invite.objects.get(code=code)
