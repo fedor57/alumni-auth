@@ -9,6 +9,11 @@ class AlumnusAdmin(admin.ModelAdmin):
     ordering = ('full_name',)
 
 
+class InviteAdmin(admin.ModelAdmin):
+    list_display = ('alumni', 'code', 'status', 'disabled_at')
+    ordering = ('alumni__full_name',)
+
+
 admin.site.register(Alumnus, AlumnusAdmin)
-admin.site.register(Invite)
+admin.site.register(Invite, InviteAdmin)
 admin.site.register(InviteLink)
