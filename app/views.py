@@ -44,7 +44,7 @@ def enter(request):
     code_param = request.POST.getlist('code')
     if len(code_param) != 1:
         return HttpResponseBadRequest("Must pass exactly one value for 'code'")
-    code_param = code_param[0]
+    code_param = code_param[0].strip()
 
     try:
         new_code = Invite.objects.get(code=code_param)
