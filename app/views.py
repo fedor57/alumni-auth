@@ -16,6 +16,7 @@ from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
 from app.forms import CodeForm, InviteForm
+import utils
 
 
 def code_required(inner):
@@ -231,10 +232,14 @@ def disable(request, inv_idx):
 
 def get_alumni(request):
     q = request.GET.get('term', '')
-    terms = q.split()
-    als = Alumnus.objects.all()
-    for term in terms:
-        als = als.filter(full_name__icontains=term)
+    names, year, letter = utils.split_search(q)
+    als = Alumnus.objects.all().order_by('full_name', 'year', 'letter')
+    for name in names:
+        als = als.filter(full_name__icontains=name)
+    if year:
+        als = als.filter(year=year)
+    if letter:
+        als = als.filter(letter=letter)
     als = als[:20]
     results = []
     for al in als:
