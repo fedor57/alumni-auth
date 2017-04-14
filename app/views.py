@@ -273,6 +273,24 @@ def check_code(request):
     return HttpResponse(json.dumps(result), 'application/json')
 
 
+def exchange_code(request):
+    code = request.POST.get('code', '')
+    app_id = request.POST.get('app', '')
+    result = {}
+    try:
+        application = Application.objects.get(slug=app_id)
+        code = Invite.objects.get(code=code)
+    except Application.DoesNotExist, Invite.DoestNotExist:
+        return HttpResponseBadRequest(json.dumps(dict(status='bad_request')), 'application/json')
+    if code.is_temporary():
+        if code.application != application:
+            return HttpResponseBadRequest(json.dumps(dict(status='bad_request')), 'application/json')
+        result['code'] = 
+
+
+
+
+
 def qa(request):
     return render(request, 'app/qa.html')
 

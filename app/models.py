@@ -31,6 +31,16 @@ class alumni(models.Model):
 #        return self.__unicode__()
 
 
+class Application(models.Model):
+    slug = models.SlugField()
+    name = models.CharField(max_length=200)
+    url = models.URLField()
+    disabled = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.slug
+
+
 class invites(models.Model):
     PREFIX = '57'
     STRENGTH = 16
@@ -45,6 +55,7 @@ class invites(models.Model):
 
     code = models.CharField(max_length=255)
     alumni = models.ForeignKey(alumni)
+    application = models.ForeignKey(Application, null=True, blank=True)
     add_time = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=STATUSES, default=STATUS_OK)
     disabled_at = models.DateTimeField(null=True, blank=True)
@@ -73,6 +84,9 @@ class invites(models.Model):
 
     def is_enabled(self):
         return self.status == self.STATUS_OK
+
+    def is_temporary(self):
+        return self.application_id is not None
 
     def disable(self, at=None):
         if at is None:
@@ -106,6 +120,7 @@ class invite_links(models.Model):
     code_from = models.ForeignKey(invites, related_name="invite_links_from")
     is_issued_by = models.BooleanField(default=False)
     is_merged_to = models.BooleanField(default=False)
+    is_temporary_for = models.BooleanField(default=False)
     add_time = models.DateTimeField(auto_now_add=True)
     session = models.CharField(max_length=100, null=True, blank=True)
 
@@ -118,3 +133,7 @@ class invite_links(models.Model):
 
  #   def __str__(self):
  #       return self.__unicode__()
+
+
+
+

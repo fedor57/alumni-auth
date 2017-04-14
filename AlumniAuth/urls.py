@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^qa$', app.views.qa),
 
     url(r'^api/v1/check_code$', csrf_exempt(app.views.check_code)),
+    url(r'^api/v1/exchange_code$', csrf_exempt(app.views.exchange_code)),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls))
