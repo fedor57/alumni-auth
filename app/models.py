@@ -1,15 +1,14 @@
-"""
-Definition of models.
-"""
-
-# Create your models here.
+import datetime
 from random import SystemRandom
-from django.db import models
-from django.utils import timezone
-from app.translit import translit
-
 import re
 import string
+import time
+
+from django.db import models
+from django.utils import timezone
+
+from app.translit import translit
+
 
 # Each model extends models.Model
 class alumni(models.Model):
@@ -36,6 +35,7 @@ class Application(models.Model):
     name = models.CharField(max_length=200)
     url = models.URLField()
     disabled = models.BooleanField(default=False)
+    valid_for = models.PositiveIntegerField()
 
     def __unicode__(self):
         return self.slug
@@ -59,6 +59,37 @@ class invites(models.Model):
     add_time = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=STATUSES, default=STATUS_OK)
     disabled_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    @classmethod
+    def temporary_for(cls, invite, application, valid_for, session):
+        try:
+            new_code = invite_links.objects.get(
+                code_from_id=invite.id,
+                is_temporary_for=True,
+                code_to__application_id=application.id
+            ).code_to
+            if valid_for is not None:
+                new_code.ensure_expires_after(valid_for)
+            return new_code
+        except invite_links.DoesNotExist:
+            pass
+
+        if valid_for is None:
+            valid_for = application.valid_for
+
+        expires_at = datetime.datetime.now() + datetime.timedelta(seconds=valid_for)
+        csprng = SystemRandom()
+        temp_code = '-'.join((
+            'T1',
+            application.slug,
+            ''.join(csprng.choice(string.digits) for _ in range(cls.STRENGTH + 2))
+        ))
+        new_code = invites(code=temp_code, application=application, alumni_id=invite.alumni_id, expires_at=expires_at)
+        new_code.save()
+        link = invite_links(code_from=invite, code_to=new_code, session=session, is_temporary_for=True)
+        link.save()
+        return new_code
 
     def __init__(self, *args, **kwargs):
         super(invites, self).__init__(*args, **kwargs)
@@ -110,6 +141,17 @@ class invites(models.Model):
         if self.status == self.STATUS_BANNED:
             return 'banned'
         return None
+
+    def expires_at_timestamp(self):
+        if self.expires_at is not None:
+            return time.mktime(self.expires_at.timetuple())
+        return None
+
+    def ensure_expires_after(self, valid_for):
+        expires_at = datetime.datetime.now() + datetime.timedelta(seconds=valid_for)
+        if expires_at > self.expires_at:
+            self.expires_at = expires_at
+            self.save()
 
 #    def __str__(self):
 #        return self.__unicode__()

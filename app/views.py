@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 
-"""
-Definition of views.
-"""
+
 import json
 import time
 
-from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
-from django.template import RequestContext
 from django.utils import timezone
 
 from app.models import alumni as Alumnus
 from app.models import invites as Invite
 from app.models import invite_links as InviteLink
+from app.models import Application
 from app.forms import CodeForm, InviteForm
 import utils
 
@@ -51,9 +48,9 @@ def enter(request):
     except Invite.DoesNotExist:
         request.session['not_found'] = True
     else:
-        if not new_code.is_enabled():
+        if not new_code.is_enabled() or new_code.is_temporary():
             request.session['disabled'] = True
-        elif request.code == None:
+        elif request.code is None:
             # Set new code as primary
             request.session['code']  = new_code.code
             request.session['codes'] = []
@@ -185,10 +182,10 @@ def invite(request, inv_idx, self_issued=False):
 
     if self_issued:
         return render(
-            request, 
-            'app/code.html', 
+            request,
+            'app/code.html',
             {
-                'code': inv_code, 
+                'code': inv_code,
                 'alumni_name': str(inviter)
             }
         )
@@ -273,22 +270,54 @@ def check_code(request):
     return HttpResponse(json.dumps(result), 'application/json')
 
 
-def exchange_code(request):
+def get_app_code(request):
     code = request.POST.get('code', '')
     app_id = request.POST.get('app', '')
+    valid_for = request.POST.get('valid_for', None)
     result = {}
+
     try:
         application = Application.objects.get(slug=app_id)
         code = Invite.objects.get(code=code)
-    except Application.DoesNotExist, Invite.DoestNotExist:
-        return HttpResponseBadRequest(json.dumps(dict(status='bad_request')), 'application/json')
+        if valid_for is not None:
+            valid_for = int(valid_for)
+            if valid_for < 0:
+                valid_for = 0
+    except Application.DoesNotExist:
+        return HttpResponseBadRequest(json.dumps(dict(
+            status='bad_request',
+            error='application not trusted'
+        )), 'application/json')
+    except Invite.DoesNotExist:
+        return HttpResponseBadRequest(json.dumps(dict(
+            status='bad_request',
+            error='code not trusted'
+        )), 'application/json')
+    except ValueError:
+        return HttpResponseBadRequest(json.dumps(dict(
+            status='bad_request',
+            error='valid_for is incorrect'
+        )), 'application/json')
+
     if code.is_temporary():
         if code.application != application:
-            return HttpResponseBadRequest(json.dumps(dict(status='bad_request')), 'application/json')
-        result['code'] = 
-
-
-
+            return HttpResponseBadRequest(json.dumps(dict(
+                status='bad_request',
+                error='code not trusted'
+            )), 'application/json')
+        if valid_for is not None:
+            code.ensure_expires_after(valid_for)
+        result['original_code'] = code.safe_form()
+        result['code'] = code.code
+        result['expires_at'] = code.expires_at_timestamp()
+        result['expires_date'] = code.expires_at.strftime('%d.%m.%Y %H:%M')
+    else:
+        temporary_for = Invite.temporary_for(code, application, valid_for, request.session.session_key)
+        result['original_code'] = code.safe_form()
+        result['code'] = temporary_for.code
+        result['expires_at'] = temporary_for.expires_at_timestamp()
+        result['expires_date'] = temporary_for.expires_at.strftime('%d.%m.%Y %H:%M')
+    return HttpResponse(json.dumps(result), 'application/json')
 
 
 def qa(request):

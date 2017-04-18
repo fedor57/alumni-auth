@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from .models import Application
 from .models import alumni as Alumnus
 from .models import invites as Invite
 from .models import invite_links as InviteLink
@@ -17,3 +19,4 @@ class InviteAdmin(admin.ModelAdmin):
 admin.site.register(Alumnus, AlumnusAdmin)
 admin.site.register(Invite, InviteAdmin)
 admin.site.register(InviteLink)
+admin.site.register(Application)
