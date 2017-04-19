@@ -83,8 +83,8 @@ if os.environ.get('APP_ENV', False):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'alumni57',
-            'USER': 'alumni',
+            'NAME': os.environ.get('DB_NAME', 'alumni57'),
+            'USER': os.environ.get('DB_USER', 'alumni'),
             'PASSWORD': os.environ['APP_PSWD'],
             'HOST': 'localhost',
             'OPTIONS': {
