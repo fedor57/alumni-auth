@@ -57,6 +57,7 @@ class invites(models.Model):
     status = models.SmallIntegerField(choices=STATUSES, default=STATUS_OK)
     disabled_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    used_at = models.DateTimeField(null=True, blank=True)
 
     @classmethod
     def temporary_for(cls, invite, application, valid_for, session):
@@ -76,7 +77,7 @@ class invites(models.Model):
             valid_for = application.valid_for
 
         expires_at = datetime.datetime.now() + datetime.timedelta(seconds=valid_for)
-        new_code = invites(application=application, alumni_id=invite.alumni_id, expires_at=expires_at)
+        new_code = invites(application=application, alumni_id=invite.alumni_id, expires_at=expires_at, used_at=datetime.datetime.now())
         new_code.code += '-' + application.slug
         new_code.save()
         link = invite_links(code_from=invite, code_to=new_code, session=session, is_temporary_for=True)

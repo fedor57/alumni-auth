@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
+import datetime
 import json
 import time
 
@@ -54,6 +54,8 @@ def enter(request):
             # Set new code as primary
             request.session['code']  = new_code.code
             request.session['codes'] = []
+            new_code.used_at = datetime.datetime.now()
+            new_code.save()
         elif request.code.alumni != new_code.alumni:
             # Forbid mixing codes for different alumni
             return render(request, 'app/alumni_switch.html', status=403)
@@ -62,6 +64,8 @@ def enter(request):
             request.session['codes'].append(new_code.code)
             request.session.modified = True
             request.code.merge_to(new_code, request.session.session_key)
+            new_code.used_at = datetime.datetime.now()
+            new_code.save()
 
     return redirect('/')
 
