@@ -26,9 +26,6 @@ class alumni(models.Model):
     def __unicode__(self):
         return self.full_name + ", " + unicode(self.year) + self.letter
 
-#    def __str__(self):
-#        return self.__unicode__()
-
 
 class Application(models.Model):
     slug = models.SlugField()
@@ -79,13 +76,8 @@ class invites(models.Model):
             valid_for = application.valid_for
 
         expires_at = datetime.datetime.now() + datetime.timedelta(seconds=valid_for)
-        csprng = SystemRandom()
-        temp_code = '-'.join((
-            'T1',
-            application.slug,
-            ''.join(csprng.choice(string.digits) for _ in range(cls.STRENGTH + 2))
-        ))
-        new_code = invites(code=temp_code, application=application, alumni_id=invite.alumni_id, expires_at=expires_at)
+        new_code = invites(application=application, alumni_id=invite.alumni_id, expires_at=expires_at)
+        new_code.code += '-' + application.slug
         new_code.save()
         link = invite_links(code_from=invite, code_to=new_code, session=session, is_temporary_for=True)
         link.save()
@@ -153,9 +145,6 @@ class invites(models.Model):
             self.expires_at = expires_at
             self.save()
 
-#    def __str__(self):
-#        return self.__unicode__()
-
 
 class invite_links(models.Model):
     code_to = models.ForeignKey(invites, related_name="invite_links_to")
@@ -173,9 +162,6 @@ class invite_links(models.Model):
     def __unicode__(self):
         return unicode(self.code_from) + " -> " + unicode(self.code_to)
 
- #   def __str__(self):
- #       return self.__unicode__()
 
-
-
-
+# class Usage(models.Model):
+#     code = models.ForeignKey(invites)
