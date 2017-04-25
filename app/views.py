@@ -110,7 +110,7 @@ def index(request, code_param = ''):
         other_invites = []
         active_codes = request.session['codes']
         for invite in Invite.objects.filter(alumni_id=myinvite.alumni_id):
-            if invite == myinvite:
+            if invite == myinvite or invite.is_temporary():
                 continue
             invited_by = InviteLink.objects.select_related('code_from__alumni').filter(code_to=invite, is_issued_by=True).order_by('add_time')
             if len(invited_by):
