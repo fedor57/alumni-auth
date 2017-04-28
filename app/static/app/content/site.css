@@ -46,3 +46,7 @@ input[type="checkbox"].input-validation-error {
     margin-top: 2em;
 }
 
+.ui-menu-item em {
+    color: gray;
+    font-size: 95%;
+}

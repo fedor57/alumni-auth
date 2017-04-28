@@ -242,12 +242,18 @@ def get_alumni(request):
     if letter:
         als = als.filter(letter=letter)
     als = als[:20]
+    app = Application.objects.get(slug='el2017')
+    election_codes = set(Invite.objects.filter(
+        alumni_id__in=[al.alumnus_id for al in als],
+        application_id=app.id
+    ).values_list('alumni_id', flat=True))
     results = []
     for al in als:
         al_json = {}
         al_json['id'] = al.alumnus_id
         al_json['label'] = unicode(al)
         al_json['value'] = al.full_name
+        al_json['voted'] = al.alumnus_id in election_codes
         results.append(al_json)
     data = json.dumps(results)
     mimetype = 'application/json'

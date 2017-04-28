@@ -44,7 +44,11 @@ $(document).ready(function () {
             $('.invitee-id').val(ui.item.id);
             $('.invite-button').removeAttr('disabled');
         }
-    });
+    }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+        return $( "<li></li>" ).data("item.autocomplete", item)
+            .append( "<a>" + item.label + (item.voted ? " <em>голосовал/-ла</em>" : "") + "</a>")
+            .appendTo( ul );
+    };
 
     $("#create-own-code").popover({
         trigger: 'hover',
@@ -56,11 +60,11 @@ $(document).ready(function () {
     });
     $(".disable-code-link").popover({
         trigger: 'hover',
-        placement: 'right',
+        placement: 'right'
     });
     $(".input-code-link").popover({
         trigger: 'hover',
-        placement: 'right',
+        placement: 'right'
     });
     $("#input-code-form").hide();
     $(".input-code-link").click(function () {
