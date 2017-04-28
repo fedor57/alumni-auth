@@ -6,7 +6,7 @@
   <title>Выпускники 57 — коды выпускников</title>
   {% load staticfiles %}
   <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
-  <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
+  <link rel="stylesheet" type="text/css" href="/static/app/content/site.css?v=2" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" type="text/css" media="all" />
   <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
   <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
@@ -41,7 +41,7 @@
 
   <script src="{% static 'app/scripts/bootstrap.js' %}"></script>
   <script src="{% static 'app/scripts/respond.js' %}"></script>
-  <script src="/static/app/scripts/appl.js?v=1"></script>
+  <script src="/static/app/scripts/appl.js?v=2"></script>
   {% block scripts %}{% endblock %}
 
   {% if 'code' in request.session %}
