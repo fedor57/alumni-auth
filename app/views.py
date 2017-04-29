@@ -241,7 +241,7 @@ def get_alumni(request):
         als = als.filter(year=year)
     if letter:
         als = als.filter(letter=letter)
-    als = als[:20]
+    als = als[:30]
     app = Application.objects.get(slug='el2017')
     election_codes = set(Invite.objects.filter(
         alumni_id__in=[al.alumnus_id for al in als],

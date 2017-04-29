@@ -46,7 +46,7 @@ $(document).ready(function () {
         }
     }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
         return $( "<li></li>" ).data("item.autocomplete", item)
-            .append( "<a>" + item.label + (item.voted ? " <em>голосовал/-ла</em>" : "") + "</a>")
+            .append( "<a>" + item.label + (item.voted ? " <em>голосовал(а)</em>" : "") + "</a>")
             .appendTo( ul );
     };
 
