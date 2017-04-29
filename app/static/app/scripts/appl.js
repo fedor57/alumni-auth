@@ -45,8 +45,14 @@ $(document).ready(function () {
             $('.invite-button').removeAttr('disabled');
         }
     }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+        var comment = '';
+        if (item.voted) {
+            comment = ' <em>голосовал(а)</em>';
+        } else if (item.have_code) {
+            comment = ' <em>есть код</em>';
+        }
         return $( "<li></li>" ).data("item.autocomplete", item)
-            .append( "<a>" + item.label + (item.voted ? " <em>голосовал(а)</em>" : "") + "</a>")
+            .append( "<a>" + item.label + comment + "</a>")
             .appendTo( ul );
     };
 
