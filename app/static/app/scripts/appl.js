@@ -46,9 +46,7 @@ $(document).ready(function () {
         }
     }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
         var comment = '';
-        if (item.voted) {
-            comment = ' <em>— голосовал(а)</em>';
-        } else if (item.have_code) {
+        if (item.have_code) {
             comment = ' <em>— есть код</em>';
         }
         return $( "<li></li>" ).data("item.autocomplete", item)
