@@ -12,6 +12,7 @@ class AlumnusAdmin(admin.ModelAdmin):
 
 
 class InviteAdmin(admin.ModelAdmin):
+    search_fields = ('alumni__full_name', 'alumni__year')
     list_display = ('alumni', 'code', 'status', 'disabled_at')
     ordering = ('alumni__full_name',)
 
