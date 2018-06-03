@@ -103,7 +103,7 @@ def index(request, code_param = ''):
             viewdata['invited_by'] = invited_by_list[0].code_from.alumni
         viewdata['invite_form'] = InviteForm()
         viewdata['invites'] = InviteLink.objects.select_related('code_to__alumni').filter(
-            code_from=myinvite,
+            code_from__alumni_id=myinvite.alumni_id,
             is_issued_by=True
         ).order_by('code_to__alumni__full_name')
         viewdata['invites'] = filter(lambda x: x.code_to.alumni != myinvite.alumni, viewdata['invites'])
